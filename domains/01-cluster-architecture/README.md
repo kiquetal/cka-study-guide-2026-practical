@@ -27,4 +27,18 @@
 - 🧪 Planned labs: RBAC, etcd backup & restore, `kubeadm upgrade`, Helm/Kustomize,
   a CRD + operator install.
 
+## Recommended labs
+
+Run on the **kubeadm VM cluster** (real control plane, certs, static pods).
+
+| # | Lab | Objective practiced | Environment |
+|---|-----|---------------------|-------------|
+| 1 | Bring up the control plane by hand (`kubeadm init` → kubeconfig → CNI → Ready) | Create clusters using kubeadm | kubeadm |
+| 2 | Join `worker1` with `kubeadm join`; regenerate a token when it expires | Create/manage clusters | kubeadm |
+| 3 | `etcdctl snapshot save` then `snapshot restore` to a new data dir; repoint `etcd.yaml` | Manage cluster lifecycle | kubeadm |
+| 4 | Create a `Role`/`RoleBinding` for a user in one namespace; verify with `kubectl auth can-i --as=` | Manage RBAC | kind or kubeadm |
+| 5 | `kubeadm upgrade` one minor version: control plane first, then drain/upgrade a worker | Manage cluster lifecycle (upgrades) | kubeadm |
+| 6 | Install a component with Helm and render/patch with Kustomize | Use Helm and Kustomize | kind |
+| 7 | Define a CRD + install a simple operator; create a custom resource | Understand CRDs / operators | kind |
+
 Back to [repo index](../../README.md).
