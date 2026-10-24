@@ -22,4 +22,20 @@
   kubeadm cluster): Service types, endpoints debugging, Ingress vs Gateway API,
   NetworkPolicy allow/deny, CoreDNS resolution.
 
+## Recommended labs
+
+Mostly fast on **kind**; CoreDNS/CNI realism on the kubeadm cluster.
+
+| # | Lab | Objective practiced | Environment |
+|---|-----|---------------------|-------------|
+| 1 | Expose a Deployment as ClusterIP, then NodePort; curl it; inspect `endpoints` | Service types and endpoints | kind |
+| 2 | Break a Service by mislabeling its selector; find the empty `endpoints` and fix | Connectivity between Pods | kind |
+| 3 | Install an Ingress controller; route `/app` to a Service via an Ingress resource | Ingress controllers/resources | kind |
+| 4 | Install Gateway API CRDs; create `GatewayClass → Gateway → HTTPRoute` to a Service | Use the Gateway API | kind |
+| 5 | Default-deny ingress in a namespace, then allow only `app=api → app=web` | Define/enforce Network Policies | kind (Calico) |
+| 6 | From a throwaway pod, resolve `<svc>.<ns>.svc.cluster.local`; break/restore CoreDNS | Understand and use CoreDNS | kind or kubeadm |
+
+> NetworkPolicy labs need an **enforcing CNI** (Calico). kind's default CNI does
+> not enforce policies — use the kubeadm cluster or a Calico-enabled kind config.
+
 Back to [repo index](../../README.md).
