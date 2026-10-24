@@ -19,8 +19,10 @@ BOX_IMAGE      = "generic/ubuntu2204"   # Ubuntu 22.04, works with libvirt
 NET_PREFIX     = "192.168.56"
 CONTROL_PLANE  = { name: "cp",      ip: "#{NET_PREFIX}.10", cpus: 2, mem: 2048 }
 WORKERS        = [
-  { name: "worker1", ip: "#{NET_PREFIX}.11", cpus: 2, mem: 2048 },
-  { name: "worker2", ip: "#{NET_PREFIX}.12", cpus: 2, mem: 2048 },
+  # Workers trimmed to 1024MB to fit the host RAM budget (~4GB total for the cluster).
+  # Bump back to 2048 if you have more free memory.
+  { name: "worker1", ip: "#{NET_PREFIX}.11", cpus: 2, mem: 1024 },
+  { name: "worker2", ip: "#{NET_PREFIX}.12", cpus: 2, mem: 1024 },
 ]
 # ---------------------------------------------------------------------------
 
