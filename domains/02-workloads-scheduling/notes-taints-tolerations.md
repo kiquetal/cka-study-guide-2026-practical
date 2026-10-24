@@ -245,6 +245,25 @@ spec:
 - **preferred** = best-effort spread, never blocks scheduling.
 - Same mechanism; the strength (`required`/`preferred`) is a *choice*, not built in.
 
+The **`preferred`** form is written differently — note it nests the selector under
+`podAffinityTerm` and adds a `weight` (1–100). Easy to get wrong on the exam:
+
+```yaml
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100                      # how strongly to prefer (SCORE bias)
+        podAffinityTerm:                 # the selector is nested here (unlike required)
+          labelSelector:
+            matchLabels: { app: web }
+          topologyKey: kubernetes.io/hostname
+```
+
+> Shape difference to memorize:
+> - `required` → a list of **terms directly** (`labelSelector` + `topologyKey`).
+> - `preferred` → a list of **{weight, podAffinityTerm}**, with the term nested.
+
 ---
 
 ## 5. Putting it together — the classic GPU example
