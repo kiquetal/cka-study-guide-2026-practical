@@ -32,6 +32,37 @@ engineering depth.
 > scale-to-zero** (Beta, on by default in v1.37) — see
 > [`domains/02-workloads-scheduling/notes-workloads.md`](domains/02-workloads-scheduling/notes-workloads.md).
 
+## Version awareness (modern k8s) 🆕
+
+The exam tracks a recent Kubernetes release, so newer features **are** fair game.
+Running tracker of recent-version changes worth studying:
+
+| Feature | Version / status | Why it matters | Notes |
+|---------|------------------|----------------|-------|
+| HPA **scale-to-zero** | gate on-by-default v1.36 (Apr 2026); **Beta + default v1.37** (Sep 2026) | Workloads & Scheduling: "configure workload autoscaling". Native scale to `minReplicas: 0` with an object/external metric | [notes-workloads.md](domains/02-workloads-scheduling/notes-workloads.md) |
+| **Gateway API** | GA / curriculum emphasis (2025 overhaul) | Services & Networking: explicit competency alongside Ingress | [notes-services-networking.md](domains/03-services-networking/notes-services-networking.md) |
+| **CRDs / Operators**, Helm, Kustomize | 2025 overhaul additions | Cluster Architecture: new competencies | [notes-cluster-architecture.md](domains/01-cluster-architecture/notes-cluster-architecture.md) |
+
+> Add a row here whenever a recent release adds something exam-relevant.
+
+### When to use a more modern k8s version in the lab
+
+The lab pins **v1.31**; the exam is on **v1.37**. Guidance:
+
+- **Learning fundamentals now (this is 90% of study):** stay on **v1.31**. Pods,
+  Deployments, Services, RBAC, etcd, scheduling, storage — identical commands and
+  behavior across these versions. No reason to rebuild.
+- **Studying a version-specific feature** (e.g. HPA scale-to-zero, a new API that
+  only exists in ≥ v1.36): bump the lab to that version first, or the feature won't
+  be there. These are the exception, not the rule.
+- **~4–6 weeks before booking (early 2027):** bump both environments to the
+  **then-current curriculum version** (re-check the [CNCF repo](https://github.com/cncf/curriculum))
+  and do your final mock runs there, so flags/output/deprecations match the real exam.
+
+How to bump (documented in each env's README):
+- kubeadm VMs → `K8S_MINOR` in `environment/vagrant-kubeadm/provision/common.sh`, then `vagrant destroy -f && vagrant up`.
+- kind → `image: kindest/node:vX.Y.Z` in `environment/kind/kind-cluster.yaml`.
+
 ## Domains & weightings 🎯
 
 Study order below follows **exam weight** (heaviest first), which is also the order
