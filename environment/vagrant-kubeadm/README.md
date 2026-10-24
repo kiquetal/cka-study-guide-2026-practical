@@ -81,6 +81,30 @@ vagrant destroy -f && vagrant up --provider=libvirt
 
 - **`vagrant up` can't find libvirt provider** → `vagrant plugin install vagrant-libvirt`
   (see [preflight](../preflight-check.md)).
+- **`Error while connecting to Libvirt ... /var/run/libvirt/libvirt-sock: Permission denied`**
+  → your user isn't in the `libvirt` group *in the current shell session*. Add it (once),
+  then start a fresh session:
+
+  ```bash
+  sudo usermod -aG libvirt,kvm "$USER"
+  newgrp libvirt          # or log out / back in for the change to take effect
+  ```
+
+  If you can't start a new session yet, run Vagrant under the group for a single command:
+
+  ```bash
+  sg libvirt -c "vagrant up --provider=libvirt"
+  ```
+
+- **Tight on RAM?** Bring up a subset instead of all three nodes (cp + one worker
+  ≈ 3 GB with the trimmed sizing in the Vagrantfile):
+
+  ```bash
+  vagrant up cp worker1 --provider=libvirt
+  # add the second worker later:
+  vagrant up worker2 --provider=libvirt
+  ```
+
 - **Nodes stuck NotReady** → CNI still coming up; wait 1-2 min, then
   `kubectl get pods -n kube-system`. Calico pods must be Running.
 - **Worker never joins** → check the control-plane finished and wrote
