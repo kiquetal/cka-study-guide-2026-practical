@@ -222,6 +222,29 @@ spec:
         topologyKey: kubernetes.io/hostname   # "same node" = same hostname
 ```
 
+**`required` (hard) vs `preferred` (soft) — what happens when you run out of nodes?**
+
+```
+   2 nodes, 3 replicas, topologyKey: kubernetes.io/hostname
+
+   requiredDuringScheduling...  (HARD → FILTER)
+   ┌──── node1 ────┐   ┌──── node2 ────┐
+   │   [web-1]     │   │   [web-2]     │     web-3 → no 3rd node to spread to
+   └───────────────┘   └───────────────┘       → web-3 stays  ❌ Pending
+       "must not share a node — rather not run than double up"
+
+   preferredDuringScheduling... (SOFT → SCORE)
+   ┌──── node1 ────┐   ┌──── node2 ────┐
+   │ [web-1]       │   │ [web-2]       │     web-3 → doubles up on a node
+   │ [web-3]  ◀────┼───┼───────────────┤       → web-3 Running  ✅ (spread not perfect)
+   └───────────────┘   └───────────────┘
+       "try to keep apart, but run anyway if you must"
+```
+
+- **required** = guaranteed spread, but risks `Pending` if nodes < replicas.
+- **preferred** = best-effort spread, never blocks scheduling.
+- Same mechanism; the strength (`required`/`preferred`) is a *choice*, not built in.
+
 ---
 
 ## 5. Putting it together — the classic GPU example
