@@ -19,6 +19,13 @@ engineering depth.
 | Validity | 2 years |
 | Delivery | Remote, proctored (PSI) |
 | Curriculum | CNCF 2025 overhaul (adds Gateway API, CRDs/Operators emphasis) |
+| Kubernetes version | **v1.37** — current curriculum is `CKA_Curriculum_v1.37.pdf` ([CNCF repo](https://github.com/cncf/curriculum)). Tracks ~latest stable; **re-verify before booking** (new minor ~every 4 months). |
+
+> ⚠️ **Lab vs exam version gap:** the lab environments currently pin **v1.31**
+> (`environment/vagrant-kubeadm/provision/common.sh` and
+> `environment/kind/kind-cluster.yaml`). Fine for learning — concepts/commands are
+> stable — but bump both to the then-current curriculum version as your 2027 exam
+> date approaches.
 
 ## Domains & weightings 🎯
 
