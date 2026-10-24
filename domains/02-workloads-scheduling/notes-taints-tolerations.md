@@ -198,14 +198,42 @@ spec:
 
 Not about node labels — about *which pods are already on a node*. Uses a
 `topologyKey` (a node label like hostname or zone) to define "together."
+Both come in **required** (hard → FILTER) and **preferred** (soft → SCORE)
+strengths, exactly like node affinity.
+
+### 4a. Pod affinity — "sit WITH pods like X"
+
+Pull this pod onto a node (or zone) that already runs a matching pod. Classic
+use: co-locate a `web` pod with the `cache` it talks to, to cut latency.
 
 ```
-   POD AFFINITY: "put me WITH pods like X"
+   POD AFFINITY: "put me WITH pods matching app=cache"
    ┌──────── node1 ────────┐   ┌──── node2 ────┐
-   │  [cache]  ◀── [web]   │   │               │   web wants to sit with cache
+   │  [cache]  ◀── [web]   │   │   [cache?] no │   web is drawn to wherever
+   │           attracted   │   │               │   a cache pod already runs
    └───────────────────────┘   └───────────────┘
 
-   POD ANTI-AFFINITY: "keep me AWAY from pods like me" (spread replicas)
+   required (HARD → FILTER)   : NO node has a cache pod → web stays ❌ Pending
+   preferred (SOFT → SCORE)   : no cache anywhere → web schedules anyway ✅
+```
+
+```yaml
+spec:
+  affinity:
+    podAffinity:                         # note: podAffinity (attract)
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels: { app: cache }    # the OTHER pods I want to be near
+        topologyKey: kubernetes.io/hostname
+```
+
+### 4b. Pod anti-affinity — "keep AWAY from pods like me"
+
+Repel this pod from nodes that already run a matching pod. Classic use: spread
+replicas one-per-node so losing a node only kills one.
+
+```
+   POD ANTI-AFFINITY: "keep me AWAY from pods matching app=web" (spread)
    ┌──── node1 ────┐   ┌──── node2 ────┐   ┌──── node3 ────┐
    │   [web-1]     │   │   [web-2]     │   │   [web-3]     │
    └───────────────┘   └───────────────┘   └───────────────┘
@@ -215,7 +243,7 @@ Not about node labels — about *which pods are already on a node*. Uses a
 ```yaml
 spec:
   affinity:
-    podAntiAffinity:
+    podAntiAffinity:                     # note: podAntiAffinity (repel)
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels: { app: web }
@@ -241,12 +269,16 @@ spec:
        "try to keep apart, but run anyway if you must"
 ```
 
-- **required** = guaranteed spread, but risks `Pending` if nodes < replicas.
-- **preferred** = best-effort spread, never blocks scheduling.
+- **required** = guaranteed (anti-affinity: spread / affinity: co-locate), but
+  risks `Pending` if no node satisfies it.
+- **preferred** = best-effort, never blocks scheduling.
 - Same mechanism; the strength (`required`/`preferred`) is a *choice*, not built in.
+- The *same required/preferred behavior applies to `podAffinity` too* — e.g.
+  required affinity ⇒ Pending if there's no matching pod to sit next to.
 
-The **`preferred`** form is written differently — note it nests the selector under
-`podAffinityTerm` and adds a `weight` (1–100). Easy to get wrong on the exam:
+The **`preferred`** form is written differently (true for both affinity and
+anti-affinity) — it nests the selector under `podAffinityTerm` and adds a
+`weight` (1–100). Easy to get wrong on the exam:
 
 ```yaml
 spec:
@@ -260,7 +292,7 @@ spec:
           topologyKey: kubernetes.io/hostname
 ```
 
-> Shape difference to memorize:
+> Shape difference to memorize (same for podAffinity + podAntiAffinity):
 > - `required` → a list of **terms directly** (`labelSelector` + `topologyKey`).
 > - `preferred` → a list of **{weight, podAffinityTerm}**, with the term nested.
 
