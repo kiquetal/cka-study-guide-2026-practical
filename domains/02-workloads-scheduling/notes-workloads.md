@@ -46,6 +46,15 @@ kubectl apply -f web.yaml
 kubectl autoscale deployment web --min=2 --max=10 --cpu-percent=80
 ```
 
+> 🆕 **HPA scale-to-zero (know this for v1.37 exam).** The `HPAScaleToZero`
+> feature gate became **on by default in v1.36** (Apr 2026), and in **v1.37**
+> ("Garhwal", Sep 2026) scale-to-zero is **Beta, enabled by default**. An HPA that
+> uses an **object or external metric** can now scale a workload down to
+> `minReplicas: 0` and bring it back when the metric fires — native, no KEDA/Knative.
+> Caveat: CPU/memory (resource) metrics alone can't drive to zero; you need an
+> object/external metric. Since the current curriculum is **v1.37**, this is
+> fair game under "Configure workload autoscaling."
+
 > 🎯 Set up these shortcuts first thing on the exam:
 > ```bash
 > alias k=kubectl

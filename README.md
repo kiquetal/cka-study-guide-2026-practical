@@ -27,6 +27,11 @@ engineering depth.
 > stable — but bump both to the then-current curriculum version as your 2027 exam
 > date approaches.
 
+> 🎯 **Exam target: first months of 2027 — top priority.** Study order follows exam
+> weight (Troubleshooting 30% first). Known recent change to study: **HPA
+> scale-to-zero** (Beta, on by default in v1.37) — see
+> [`domains/02-workloads-scheduling/notes-workloads.md`](domains/02-workloads-scheduling/notes-workloads.md).
+
 ## Domains & weightings 🎯
 
 Study order below follows **exam weight** (heaviest first), which is also the order
