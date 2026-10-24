@@ -292,4 +292,76 @@ kubectl get node <node> --show-labels
  hard   = FILTER → Pending if unmet  |   soft    = SCORE  → just a preference
 ```
 
+---
+
+## 8. Self-test (Q&A)
+
+Cover the answers and quiz yourself. These are exam-style.
+
+**Q1. Pod is `Pending`; event says `untolerated taint {dedicated=db:NoSchedule}`.
+Give two ways to get it scheduled.**
+- A) Add a **toleration** to the pod matching `dedicated=db:NoSchedule`
+  (change the pod — keeps the node reserved).
+- B) Remove the taint from the node: `kubectl taint nodes <node> dedicated=db:NoSchedule-`
+  (change the node — the trailing `-` removes).
+- ⚠️ Vocabulary: taints go on **nodes**, tolerations on **pods**. You never
+  "taint a pod."
+
+**Q2. Does adding a toleration guarantee the pod lands on that tainted node?**
+- **No.** A toleration is *permission* ("may enter"), not *attraction*. The
+  scheduler may still pick any other eligible node. To force placement you also
+  need `nodeSelector` or node affinity. (A toleration is NOT a "preference" —
+  that word belongs to `preferred...` affinity.)
+
+**Q3. `NoExecute` vs `NoSchedule` for pods ALREADY running on the node?**
+- `NoSchedule` → blocks only **new** pods; running pods stay.
+- `NoExecute` → also **evicts** running pods that don't tolerate it.
+  Timing via `tolerationSeconds`: none → immediate; `300` → after 300s;
+  tolerated with no seconds → stays forever.
+
+**Q4. `requiredDuringScheduling...` vs `preferredDuringScheduling...` in node affinity?**
+- `required` = HARD → part of **FILTER** → no match ⇒ pod stays `Pending`.
+- `preferred` = SOFT → part of **SCORE** → biases ranking by `weight`, but the
+  pod still schedules if nothing matches.
+- Shared `IgnoredDuringExecution` = checked only at schedule time; later label
+  changes don't evict a running pod (unlike a `NoExecute` taint).
+- Hook: **required = Pending if unmet; preferred = just a tiebreaker.**
+
+**Q5. Spread 3 `web` replicas one-per-node across 3 nodes — mechanism + key field?**
+- `podAntiAffinity` → `requiredDuringSchedulingIgnoredDuringExecution` →
+  `labelSelector` matching `app: web` → `topologyKey: kubernetes.io/hostname`
+  (hostname = "same node").
+
+### Hands-on (run on the live `cp` cluster)
+
+**Q6. Single-node cluster won't run app pods (control-plane taint). Remove it + verify.**
+```bash
+kubectl taint nodes cp node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl describe node cp | grep -A3 Taints      # expect: Taints: <none>
+```
+
+**Q7. Taint `cp` with `env=prod:NoSchedule`, prove a plain nginx pod stays Pending.**
+```bash
+kubectl taint nodes cp env=prod:NoSchedule
+kubectl run nginx --image=nginx
+kubectl describe pod nginx | grep -A5 Events     # untolerated taint {env=prod}
+kubectl delete pod nginx
+kubectl taint nodes cp env=prod:NoSchedule-      # cleanup
+```
+
+**Q8. Label `cp` `disktype=ssd` and require it via nodeSelector.**
+```bash
+kubectl label nodes cp disktype=ssd
+```
+```yaml
+spec:
+  nodeSelector:
+    disktype: ssd
+  containers:
+  - name: web
+    image: nginx
+```
+Exam speed: `kubectl run web --image=nginx --dry-run=client -o yaml > web.yaml`,
+then add the `nodeSelector`.
+
 Back to [domain index](../README.md) · [repo index](../../README.md).
