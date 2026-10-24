@@ -1,19 +1,23 @@
 # Domain 05 — Troubleshooting (30%)
 
-> **Status:** Placeholder. Content will be added in a later increment.
-> This is the **highest-weight** domain — it will be built out first.
+🎯 Highest-weight domain. Source: [CNCF CKA Curriculum](https://github.com/cncf/curriculum).
 
-Planned contents:
+## Exam objectives (official competencies)
 
-- Study notes on diagnosing node, control-plane, networking, and workload failures.
-- `cheatsheet.md` — triage commands (`kubectl get events`, `journalctl -u kubelet`,
-  `crictl ps`, etc.).
-- `labs/` — **break/fix** exercises (run on the kubeadm VM cluster in
-  [`../../environment/vagrant-kubeadm/`](../../environment/vagrant-kubeadm/) for systemd realism):
-  - kubelet / node NotReady failures.
-  - Control-plane static-pod issues.
-  - DNS / networking debugging.
-  - `crictl` container runtime inspection.
-  - Resource exhaustion.
+- [ ] Troubleshoot clusters and nodes
+- [ ] Troubleshoot cluster components
+- [ ] Monitor cluster and application resource usage
+- [ ] Manage and evaluate container output streams (logs)
+- [ ] Troubleshoot services and networking
+
+## Study material here
+
+- 📖 [`notes-troubleshooting.md`](notes-troubleshooting.md) — triage order, node
+  NotReady, control-plane static-pod recovery, pod STATUS decode, service
+  endpoints, `crictl`, resource exhaustion.
+- 🧪 `labs/` — break/fix exercises (planned; run on the kubeadm VM cluster in
+  [`../../environment/vagrant-kubeadm/`](../../environment/vagrant-kubeadm/) for
+  systemd realism): kubelet/node NotReady, control-plane static pods, DNS/networking,
+  `crictl`, resource exhaustion.
 
 Back to [repo index](../../README.md).
