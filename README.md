@@ -1,0 +1,78 @@
+# CKA 2027 Study Guide & Practical Lab
+
+My personal, hands-on journey to the **Certified Kubernetes Administrator (CKA)** exam,
+target **2027**. Organized by the official exam domains, backed by isolated lab
+environments that mirror the real exam, plus a "beyond exam" track for real-world
+engineering depth.
+
+> **Legend:** 🎯 = exam scope &nbsp;|&nbsp; 🚀 = beyond exam / real-world
+
+---
+
+## Exam overview
+
+| Attribute | Detail |
+|-----------|--------|
+| Format | Performance-based, hands-on in a live terminal (no multiple choice) |
+| Duration | 2 hours |
+| Passing score | 66% |
+| Validity | 2 years |
+| Delivery | Remote, proctored (PSI) |
+| Curriculum | CNCF 2025 overhaul (adds Gateway API, CRDs/Operators emphasis) |
+
+## Domains & weightings 🎯
+
+Study order below follows **exam weight** (heaviest first), which is also the order
+these sections get built out.
+
+| # | Domain | Weight | Folder |
+|---|--------|:------:|--------|
+| 05 | Troubleshooting | **30%** | [`domains/05-troubleshooting/`](domains/05-troubleshooting/) |
+| 01 | Cluster Architecture, Installation & Configuration | **25%** | [`domains/01-cluster-architecture/`](domains/01-cluster-architecture/) |
+| 03 | Services & Networking (incl. Gateway API) | **20%** | [`domains/03-services-networking/`](domains/03-services-networking/) |
+| 02 | Workloads & Scheduling | **15%** | [`domains/02-workloads-scheduling/`](domains/02-workloads-scheduling/) |
+| 04 | Storage | **10%** | [`domains/04-storage/`](domains/04-storage/) |
+
+## Primary learning resources (O'Reilly)
+
+- **PRIMARY — _CKA Study Guide, 2nd Edition_ (Benjamin Muschko)** — rebuilt for the
+  2025 curriculum overhaul (CRDs/Operators, Gateway API). Main reference for this repo.
+- **SECONDARY — _Certified Kubernetes Administrator (CKA), 4th Edition_ [Video]** —
+  newest video edition; watch for hands-on demonstrations.
+
+Take notes freely in [`course-notes/`](course-notes/) as you watch/read.
+
+---
+
+## Repository map
+
+| Section | What's there | Status |
+|---------|--------------|--------|
+| [`course-notes/`](course-notes/) | Free-form notes + a questions queue for Kiro | ✅ Ready |
+| [`environment/`](environment/) | Isolated lab setup: kubeadm VMs + kind | ✅ Ready |
+| [`roadmap/`](roadmap/2027-study-plan.md) | Phased timeline to the 2027 exam | 🕓 Later |
+| [`domains/`](domains/) | 🎯 Per-domain notes + hands-on labs | 🕓 Later |
+| [`exam-prep/`](exam-prep/) | 🎯 Logistics, global cheatsheet, mock-exam tracker | 🕓 Later |
+| [`beyond-exam/istio-ambient/`](beyond-exam/istio-ambient/) | 🚀 Istio Ambient mesh (real-world) | 🕓 Later |
+| [`PLAN.md`](PLAN.md) | Full multi-increment plan | ✅ Ready |
+
+---
+
+## How to use this repo
+
+1. **Set up the lab first.** Start with the environment preflight:
+   [`environment/preflight-check.md`](environment/preflight-check.md) to confirm your
+   Pop!_OS machine can run VMs, then stand up a cluster.
+   - Exam-realistic multi-node cluster (systemd kubelet, real kubeadm):
+     [`environment/vagrant-kubeadm/`](environment/vagrant-kubeadm/)
+   - Fast, disposable cluster for quick experiments:
+     [`environment/kind/`](environment/kind/)
+2. **Watch/read + take notes.** Drop running notes in
+   [`course-notes/notes.md`](course-notes/notes.md). Anything you want me (Kiro) to
+   research later goes in
+   [`course-notes/questions-for-kiro.md`](course-notes/questions-for-kiro.md).
+3. **Practice by domain**, heaviest weight first (Troubleshooting → ... → Storage).
+4. **Go beyond the exam** once comfortable, with
+   [`beyond-exam/istio-ambient/`](beyond-exam/istio-ambient/).
+
+See [`PLAN.md`](PLAN.md) for the complete plan and what each future increment adds.
