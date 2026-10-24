@@ -109,6 +109,27 @@ vagrant destroy -f && vagrant up --provider=libvirt
   `kubectl get pods -n kube-system`. Calico pods must be Running.
 - **Worker never joins** → check the control-plane finished and wrote
   `join-command.sh`; then `vagrant provision worker1`.
+- **Provisioning fails early with `Temporary failure resolving` / `Could not
+  resolve host`** → the `generic/ubuntu2204` box ships `systemd-resolved`
+  pointed at flaky hardcoded public DNS servers (`4.2.2.x`), so `apt-get`
+  can't reach the Ubuntu mirrors or `pkgs.k8s.io` and `common.sh` aborts at
+  its first `apt` call (it runs under `set -e`). `common.sh` now fixes this
+  up front by writing a static `/etc/resolv.conf` that uses the libvirt NAT
+  gateway plus public resolvers. If you ever hit it on a running node, apply
+  the same fix by hand:
+
+  ```bash
+  sudo tee /etc/resolv.conf >/dev/null <<'EOF'
+  nameserver 192.168.121.1   # libvirt NAT gateway (adjust if your net differs)
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+  options timeout:2 attempts:3
+  EOF
+  # verify, then clear any stuck apt and re-provision:
+  getent hosts pkgs.k8s.io && sudo apt-get update
+  ```
+
+  Find your actual gateway with `ip route | grep default` inside the node.
 
 ---
 

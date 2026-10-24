@@ -9,6 +9,20 @@ set -euxo pipefail
 
 K8S_MINOR="v1.31"   # <-- pinned Kubernetes minor version
 
+# The generic/ubuntu2204 box ships systemd-resolved pointed at flaky hardcoded
+# public DNS servers (4.2.2.x). They intermittently fail to resolve, so apt-get
+# can't reach the Ubuntu mirrors or pkgs.k8s.io and this script aborts under
+# `set -e` at its first apt call. Pin a static /etc/resolv.conf to the libvirt
+# NAT gateway (plus public fallbacks) before doing anything network-related.
+echo "[common] Pinning reliable DNS (libvirt gateway + public fallbacks)"
+GW="$(ip route | awk '/^default/ {print $3; exit}')"
+cat >/etc/resolv.conf <<EOF
+nameserver ${GW:-192.168.121.1}
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+options timeout:2 attempts:3
+EOF
+
 echo "[common] Disabling swap (kubelet requires it off)"
 swapoff -a
 sed -i '/ swap / s/^/#/' /etc/fstab || true
