@@ -119,6 +119,12 @@ no CNI (pod network) installed yet.**
 
 Installing a CNI fixes both at once.
 
+> 🎯 **Related concept — taints:** while `NotReady`, the node carries an automatic
+> `node.kubernetes.io/not-ready` taint that blocks scheduling, which is the *other*
+> reason CoreDNS is `Pending`. Once the CNI makes the node `Ready`, that taint
+> clears and CoreDNS schedules instantly. Full notes:
+> [`../../02-workloads-scheduling/notes-taints-tolerations.md`](../../02-workloads-scheduling/notes-taints-tolerations.md).
+
 ---
 
 ## Step 6 — Install the Calico CNI  _(run on: node)_
