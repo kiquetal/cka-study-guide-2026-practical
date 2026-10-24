@@ -130,6 +130,16 @@ vagrant destroy -f && vagrant up --provider=libvirt
   ```
 
   Find your actual gateway with `ip route | grep default` inside the node.
+- **`kubeadm init` fails preflight with `[ERROR FileExisting-conntrack]: conntrack
+  not found`** → the `generic/ubuntu2204` box doesn't ship `conntrack` (a fatal
+  kubeadm requirement for kube-proxy) or `socat` (needed by `kubectl port-forward`).
+  `common.sh` now installs both alongside containerd. On a running node you can add
+  them by hand, then re-provision:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install -y conntrack socat
+  sudo kubeadm reset -f        # only if a partial init left state behind
+  ```
 
 ---
 

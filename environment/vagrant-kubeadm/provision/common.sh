@@ -43,10 +43,13 @@ net.ipv4.ip_forward                 = 1
 EOF
 sysctl --system
 
-echo "[common] Installing containerd"
+echo "[common] Installing containerd + kubeadm runtime deps (conntrack, socat)"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install -y ca-certificates curl gnupg apt-transport-https containerd
+# conntrack is a FATAL kubeadm preflight requirement (kube-proxy needs it); socat
+# is required for `kubectl port-forward`. The generic/ubuntu2204 box ships neither,
+# so without them `kubeadm init` aborts at preflight and control-plane.sh never runs.
+apt-get install -y ca-certificates curl gnupg apt-transport-https containerd conntrack socat
 
 echo "[common] Configuring containerd with systemd cgroup driver"
 mkdir -p /etc/containerd
