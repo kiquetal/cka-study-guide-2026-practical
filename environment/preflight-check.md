@@ -72,12 +72,16 @@ Vagrant from the Pop!_OS repos is fine; or use HashiCorp's apt repo for a newer 
 # Option A: distro package
 sudo apt-get install -y vagrant
 
-# Build deps for the libvirt plugin:
-sudo apt-get install -y libvirt-dev ruby-dev gcc make
+# Build deps for the libvirt plugin (pkg-config is required on Pop!_OS 22.04):
+sudo apt-get install -y libvirt-dev ruby-dev gcc make pkg-config
 
 # The plugin that lets Vagrant drive libvirt/KVM:
 vagrant plugin install vagrant-libvirt
 ```
+
+> **Shortcut:** steps 3–4 are scripted (idempotent) in
+> [`setup-vagrant-libvirt.sh`](setup-vagrant-libvirt.sh). Run
+> `./environment/setup-vagrant-libvirt.sh` to install + verify in one go.
 
 Verify:
 
