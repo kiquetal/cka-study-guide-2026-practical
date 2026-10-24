@@ -1,0 +1,63 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# CKA lab: 1 control-plane + 2 workers, exam-realistic (real kubeadm + systemd kubelet).
+# Provider: libvirt/KVM (best on Pop!_OS). See ../preflight-check.md first.
+#
+# Lifecycle:
+#   vagrant up --provider=libvirt     # build all 3 nodes
+#   vagrant ssh cp                     # shell into the control-plane
+#   vagrant destroy -f                 # remove everything (host untouched)
+#
+# All nodes live on a private network 192.168.56.0/24. Nothing is exposed to your host
+# beyond that private net, so the cluster is fully isolated.
+
+# ----- Tunables -------------------------------------------------------------
+# Pod CIDR must match what the CNI (Calico) expects; see provision/control-plane.sh.
+POD_CIDR       = "10.244.0.0/16"
+BOX_IMAGE      = "generic/ubuntu2204"   # Ubuntu 22.04, works with libvirt
+NET_PREFIX     = "192.168.56"
+CONTROL_PLANE  = { name: "cp",      ip: "#{NET_PREFIX}.10", cpus: 2, mem: 2048 }
+WORKERS        = [
+  { name: "worker1", ip: "#{NET_PREFIX}.11", cpus: 2, mem: 2048 },
+  { name: "worker2", ip: "#{NET_PREFIX}.12", cpus: 2, mem: 2048 },
+]
+# ---------------------------------------------------------------------------
+
+Vagrant.configure("2") do |config|
+  config.vm.box = BOX_IMAGE
+
+  # Common provisioning on every node (runtime + kube binaries).
+  # Pass the control-plane IP + pod CIDR into the scripts via env.
+  common_env = { "CONTROL_PLANE_IP" => CONTROL_PLANE[:ip], "POD_CIDR" => POD_CIDR }
+
+  # ---- Control plane ----
+  config.vm.define CONTROL_PLANE[:name] do |cp|
+    cp.vm.hostname = CONTROL_PLANE[:name]
+    cp.vm.network "private_network", ip: CONTROL_PLANE[:ip]
+
+    cp.vm.provider :libvirt do |lv|
+      lv.cpus   = CONTROL_PLANE[:cpus]
+      lv.memory = CONTROL_PLANE[:mem]
+    end
+
+    cp.vm.provision "shell", path: "provision/common.sh", env: common_env
+    cp.vm.provision "shell", path: "provision/control-plane.sh", env: common_env
+  end
+
+  # ---- Workers ----
+  WORKERS.each do |w|
+    config.vm.define w[:name] do |node|
+      node.vm.hostname = w[:name]
+      node.vm.network "private_network", ip: w[:ip]
+
+      node.vm.provider :libvirt do |lv|
+        lv.cpus   = w[:cpus]
+        lv.memory = w[:mem]
+      end
+
+      node.vm.provision "shell", path: "provision/common.sh", env: common_env
+      node.vm.provision "shell", path: "provision/worker.sh", env: common_env
+    end
+  end
+end

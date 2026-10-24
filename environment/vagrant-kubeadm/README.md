@@ -1,0 +1,91 @@
+# vagrant-kubeadm — Exam-Realistic Cluster
+
+A **3-node** Kubernetes cluster (1 control-plane + 2 workers) built with **real
+`kubeadm`** on **libvirt/KVM** VMs. This mirrors the CKA exam environment: systemd
+`kubelet`, static-pod manifests, real node joins — the stuff you actually troubleshoot
+on the exam.
+
+> Do the [preflight check](../preflight-check.md) first (VT-x/KVM + `vagrant-libvirt`).
+
+## What gets built
+
+| Node | Hostname | IP | Role |
+|------|----------|----|------|
+| Control plane | `cp` | `192.168.56.10` | API server, etcd, scheduler, controller-manager |
+| Worker 1 | `worker1` | `192.168.56.11` | workloads |
+| Worker 2 | `worker2` | `192.168.56.12` | workloads |
+
+- **Container runtime:** containerd (systemd cgroup driver)
+- **CNI:** Calico (`v3.28.0`), pod CIDR `10.244.0.0/16`
+- **Kubernetes:** pinned to `v1.31` (see "Changing the version" below)
+- **Isolation:** nodes sit on a private network `192.168.56.0/24`; nothing is published
+  to your host. `vagrant destroy` removes everything.
+
+## Files
+
+```
+vagrant-kubeadm/
+├── Vagrantfile              # defines the 3 VMs (libvirt)
+└── provision/
+    ├── common.sh            # runs on ALL nodes: containerd + kubeadm/kubelet/kubectl
+    ├── control-plane.sh     # kubeadm init + Calico + emits join command
+    └── worker.sh            # waits for + runs the join command
+```
+
+The control-plane writes `join-command.sh` into the shared `/vagrant` folder; workers
+read it from there. (That generated file is git-ignored.)
+
+## Lifecycle
+
+```bash
+# From this directory:
+vagrant up --provider=libvirt     # build & provision all 3 nodes (takes a few minutes)
+
+# Shell into a node:
+vagrant ssh cp
+vagrant ssh worker1
+
+# On the control-plane, verify the cluster:
+vagrant ssh cp -c 'kubectl get nodes -o wide'
+# Expect cp + worker1 + worker2, all STATUS=Ready (after Calico settles, ~1-2 min)
+
+# Tear it all down (fully removes the VMs; your host is untouched):
+vagrant destroy -f
+```
+
+## Verify it worked
+
+```bash
+vagrant ssh cp -c 'kubectl get nodes'
+# NAME      STATUS   ROLES           AGE   VERSION
+# cp        Ready    control-plane   ...   v1.31.x
+# worker1   Ready    <none>          ...   v1.31.x
+# worker2   Ready    <none>          ...   v1.31.x
+
+vagrant ssh cp -c 'kubectl get pods -n kube-system'
+# calico-* , coredns-*, etcd-cp, kube-apiserver-cp, etc. all Running
+```
+
+If a worker is missing, re-run its provisioner: `vagrant provision worker1`.
+
+## Changing the Kubernetes version
+
+Edit `K8S_MINOR` in [`provision/common.sh`](provision/common.sh) (e.g. `v1.31` →
+`v1.32`), then rebuild:
+
+```bash
+vagrant destroy -f && vagrant up --provider=libvirt
+```
+
+## Troubleshooting the setup
+
+- **`vagrant up` can't find libvirt provider** → `vagrant plugin install vagrant-libvirt`
+  (see [preflight](../preflight-check.md)).
+- **Nodes stuck NotReady** → CNI still coming up; wait 1-2 min, then
+  `kubectl get pods -n kube-system`. Calico pods must be Running.
+- **Worker never joins** → check the control-plane finished and wrote
+  `join-command.sh`; then `vagrant provision worker1`.
+
+---
+
+Back to [environment overview](../README.md) · [repo index](../../README.md).
