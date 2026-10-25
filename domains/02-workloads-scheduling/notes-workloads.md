@@ -190,4 +190,35 @@ A pod stuck `Running 0/1` is almost always a failing **readiness** probe.
  generate YAML fast    → <cmd> --dry-run=client -o yaml > file.yaml
 ```
 
+---
+
+## 7. What's new in v1.37 ("Garhwal") — Workloads & Scheduling
+
+The exam tracks v1.37, so these are fair game. Status in parentheses.
+
+- **HPA scale-to-zero (Beta, default on)** — `minReplicas: 0` with an **object or
+  external** metric (not CPU/mem). Sets a `ScaledToZero` condition. Covered in §1.
+- **Configurable HPA tolerance (GA)** — set per-HPA, per-direction tolerance under
+  `behavior.scaleUp/scaleDown.tolerance` (a ratio, e.g. `0.05` = react at target×1.05),
+  replacing the old global 10%.
+  ```yaml
+  spec:
+    behavior:
+      scaleUp:
+        tolerance: 0.05
+  ```
+- **In-place resize of init & sidecar containers (GA)** — change a running
+  container's CPU/mem `requests`/`limits` without recreating the Pod. Per-resource
+  `resizePolicy`: `NotRequired` (live) or `RestartContainer` (restart just that one).
+  App-container resize has been GA since v1.35; v1.37 extends it to sidecars/init.
+- **Pod-level resources & managers (resources GA since v1.34; managers Beta, OFF by
+  default in v1.37)** — set `spec.resources` for the whole Pod, not just per container.
+- **Memory QoS (Beta)** — kubelet uses cgroup v2 `memory.min`/`memory.high` to throttle
+  before OOM; needs `memoryThrottlingFactor` in kubelet config. (See also Troubleshooting.)
+- **Node declared features (GA)** — nodes publish `status.declaredFeatures`; scheduler
+  only places feature-using Pods on nodes that support them (matters during upgrades).
+- **Gang scheduling via Workload API (Beta, `scheduling.k8s.io/v1beta1`)** — all-or-
+  nothing scheduling for tightly-coupled jobs (`Workload` → `PodGroup` → Pods,
+  `minCount`). Gate `GenericWorkload`. Niche/batch — know it exists.
+
 Back to [domain index](README.md) · [repo index](../../README.md).

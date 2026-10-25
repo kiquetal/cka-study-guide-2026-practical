@@ -165,4 +165,14 @@ CoreDNS down → every in-cluster name fails. Classic cascading symptom.
  DNS broken                → check CoreDNS pods in kube-system
 ```
 
+---
+
+## 6. What's new in v1.37 ("Garhwal") — networking impact
+
+- **kube-proxy IPVS mode deprecated** — `kubeadm` now emits a warning when IPVS is
+  configured. On newer kernels the recommended dataplane is **nftables** (GA since
+  v1.33); **iptables** remains the default and is still supported on older kernels.
+  If you see an IPVS deprecation warning during an upgrade, it's expected — plan a
+  move to nftables, but nothing breaks immediately.
+
 Back to [domain index](README.md) · [repo index](../../README.md).

@@ -171,4 +171,27 @@ free -h ; df -h ; top
  DNS fails                    → CoreDNS pods in kube-system
 ```
 
+---
+
+## 8. What's new in v1.37 ("Garhwal") — troubleshooting impact
+
+New failure modes to recognize after a v1.37 upgrade:
+
+- **kubelet won't start after upgrade → legacy cAdvisor flag.** v1.37 removed old
+  cAdvisor flags; the kubelet **fails to start** if one is still set (only
+  `--housekeeping-interval` survives). Check `journalctl -u kubelet` for an
+  unknown-flag error, then fix the kubelet config/flags.
+- **Dashboards/alerts suddenly empty.** Some cAdvisor metric series are gone
+  (`container_tasks_state`, `container_cpu_load_average_10s`). Not a cluster fault —
+  the metrics were removed.
+- **SELinux-enabled node: workloads fail to mount volumes after upgrade.** SELinux
+  mount labeling is GA/default in v1.37 and can break existing volume mounts. Symptom:
+  pods stuck `ContainerCreating` with permission/relabel errors on SELinux hosts.
+- **Memory QoS (Beta) changes OOM behavior.** With `memoryThrottlingFactor` set, the
+  kernel throttles (via cgroup v2 `memory.high`) *before* the hard limit, so a
+  container may slow down rather than OOMKill outright. Know this when diagnosing
+  "pod is slow but not restarting."
+- **`kubectl top` is stable** — Metrics API (`metrics.k8s.io`) reached v1; still needs
+  metrics-server installed.
+
 Back to [domain index](README.md) · [repo index](../../README.md).

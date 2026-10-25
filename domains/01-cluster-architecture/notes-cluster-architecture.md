@@ -169,4 +169,29 @@ kubectl config set-context --current --namespace=dev   # change default ns
  switch cluster/ns       → kubectl config use-context / set-context --current -n
 ```
 
+---
+
+## 7. What's new in v1.37 ("Garhwal") — cluster-admin impact
+
+Mostly matters for **upgrades** (this domain) and troubleshooting after one.
+
+- **SELinux mount is GA / default on (action required)** — on SELinux-enabled
+  clusters this changes volume labeling and can **break existing workloads**. Read
+  the k8s SELinux-volume-labeling blog before upgrading; clusters without SELinux
+  are unaffected.
+- **kube-proxy IPVS mode deprecated** — `kubeadm` now warns when IPVS is used.
+  Recommended mode on newer kernels is **nftables** (GA since v1.33); iptables still
+  default/supported on older kernels.
+- **`scheduling.k8s.io/v1alpha2` removed** — delete any `v1alpha2` workload-scheduling
+  objects from the API server **before** upgrading, or the upgrade trips on them.
+- **Legacy cAdvisor flags/metrics removed** — the kubelet **fails to start** if an
+  old cAdvisor flag is set (only `--housekeeping-interval` kept). Some metric series
+  (`container_tasks_state`, `container_cpu_load_average_10s`) are gone — check
+  dashboards. (Cross-ref: Troubleshooting "node NotReady / kubelet won't start".)
+- **Metrics API (`metrics.k8s.io`) reached v1** — underpins `kubectl top` /
+  metrics-server; stable now.
+- **Node declared features (GA)** — during a mixed-version upgrade, the scheduler
+  only places feature-using Pods on nodes that advertise support (fewer
+  "scheduled but failing" surprises).
+
 Back to [domain index](README.md) · [repo index](../../README.md).

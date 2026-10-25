@@ -159,4 +159,20 @@ kubectl get pv,pvc,storageclass
  many writers            → need RWX access mode + a backend that supports it
 ```
 
+---
+
+## 8. What's new in v1.37 ("Garhwal") — storage impact
+
+Minor for the exam, but know them:
+
+- **`AnyVolumeDataSource` feature gate removed** — it had been locked-on (GA) since
+  v1.33, so behavior is unchanged; the gate is just gone. Populating a PVC from a
+  custom data source (e.g. a snapshot/CRD) is standard now.
+- **In-place resize of memory-backed `emptyDir` (Alpha)** — part of the in-place
+  pod-resize work; lets you resize a memory-backed `emptyDir` without recreating the
+  Pod (gate `InPlacePodVerticalScalingMemoryBackedVolumes`). Niche/alpha.
+- **SELinux mount GA (cross-ref Cluster Architecture)** — changes volume labeling on
+  SELinux hosts; can break mounts after upgrade. Symptom shows up as storage/mount
+  failures, so it's worth knowing here too.
+
 Back to [domain index](README.md) · [repo index](../../README.md).
