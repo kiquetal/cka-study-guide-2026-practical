@@ -180,5 +180,103 @@ vagrant ssh cp -c 'kubectl get pods -n kube-system'
 
 ---
 
+## 7. DNS reverts to the systemd-resolved stub (root cause of §5)
+
+**Symptom** — even though `common.sh` writes a static `/etc/resolv.conf`, inside the
+running VM it is back to:
+
+```
+nameserver 127.0.0.53
+options edns0 trust-ad
+```
+
+and `getent hosts mirrors.edge.kernel.org` returns nothing (`RESOLVE FAILED`), so
+`apt-get` aborts provisioning.
+
+**Root cause** — on the `generic/ubuntu2204` box `/etc/resolv.conf` is a **symlink
+managed by `systemd-resolved`**. `common.sh` does `cat >/etc/resolv.conf`, which
+writes *through* the symlink; systemd-resolved then rewrites it back to its stub
+resolver (`127.0.0.53`). That stub has no working upstream on this libvirt network,
+so every lookup fails. The gateway DNS itself is fine — proven by:
+
+```bash
+# inside the VM, these BOTH resolve correctly:
+nslookup mirrors.edge.kernel.org 192.168.121.1   # libvirt NAT gateway dnsmasq
+nslookup mirrors.edge.kernel.org 1.1.1.1
+```
+
+**Fix (applied live, per node)** — replace the symlink with a real static file that
+points at the libvirt gateway + public fallbacks, then re-provision:
+
+```bash
+vagrant ssh <node> -c 'sudo rm -f /etc/resolv.conf && printf "nameserver 192.168.121.1\nnameserver 1.1.1.1\nnameserver 8.8.8.8\noptions timeout:2 attempts:3\n" | sudo tee /etc/resolv.conf >/dev/null && getent hosts pkgs.k8s.io && echo DNS OK'
+vagrant provision <node>
+```
+
+> `192.168.121.1` is the `vagrant-libvirt` network's gateway on this host. Confirm
+> yours with `virsh net-dumpxml vagrant-libvirt | grep "ip address"` (or
+> `ip route | grep default` inside the VM — the gateway is the `via` address).
+>
+> Permanent fix (TODO in `common.sh`): `rm -f /etc/resolv.conf` to break the symlink
+> *before* writing the static file, so systemd-resolved can't revert it.
+
+---
+
+## 8. Workers can't join — `/vagrant` synced folder not mounted
+
+**Symptom** — the control-plane provisioning fails on its last step:
+
+```
+cp: /tmp/vagrant-shell: line 28: /vagrant/join-command.sh: No such file or directory
+```
+
+and each worker loops 60× then errors:
+
+```
+worker1: [worker] ERROR: join command never appeared. Did the control-plane finish provisioning?
+```
+
+**Root cause** — the handoff is file-based: `control-plane.sh` writes the join
+command to `/vagrant/join-command.sh` and `worker.sh` waits for it there. But the
+default `/vagrant` **synced folder is not mounted** under `vagrant-libvirt` on this
+host (it needs NFS or a 9p/virtiofs driver that isn't active):
+
+```bash
+vagrant ssh cp -c 'mount | grep vagrant || echo "NO /vagrant MOUNT"'
+# -> NO /vagrant MOUNT
+```
+
+So the control plane is actually healthy — `kubeadm init` + Calico succeeded; only
+the file write failed. Everything after the error is fine.
+
+**Fix (manual join, works today)** — pull the join command from the control plane and
+run it on the worker by hand:
+
+```bash
+# 1. on the control plane, mint a fresh join command (tokens last 24h):
+vagrant ssh cp -c 'kubeadm token create --print-join-command'
+# -> kubeadm join 192.168.56.10:6443 --token <tok> --discovery-token-ca-cert-hash sha256:<hash>
+
+# 2. make sure the worker has its binaries (fix DNS first — see §7 — then):
+vagrant provision worker1   # installs containerd + kubeadm/kubelet/kubectl
+# (it will still error at the /vagrant wait — that's expected; binaries are installed)
+
+# 3. run the join on the worker by hand:
+vagrant ssh worker1 -c 'sudo kubeadm join 192.168.56.10:6443 --token <tok> \
+  --discovery-token-ca-cert-hash sha256:<hash>'
+
+# 4. verify from the control plane (worker is NotReady ~1 min while Calico starts):
+vagrant ssh cp -c 'kubectl get nodes -o wide'
+```
+
+> Proper fixes (TODO):
+> - enable NFS synced folders in the `Vagrantfile`
+>   (`config.vm.synced_folder ".", "/vagrant", type: "nfs"`, needs
+>   `nfs-kernel-server` on the host), **or**
+> - stop relying on `/vagrant`: have the control plane print the join command and
+>   pass it to workers another way (e.g. a provisioner that reads it over SSH).
+
+---
+
 Back to [vagrant-kubeadm README](README.md) · [environment overview](../README.md)
 · [repo index](../../README.md).
