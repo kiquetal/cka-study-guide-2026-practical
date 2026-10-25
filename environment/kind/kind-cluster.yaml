@@ -6,12 +6,19 @@
 #
 # Pin the node image to a specific Kubernetes version for reproducibility.
 # Find images at: https://github.com/kubernetes-sigs/kind/releases
+#
+# NOTE: v1.37.0 node images require kind >= v0.33.0. Your kind must be new
+# enough to know this image; older kind (e.g. v0.22.0) cannot run it.
+# kind requires the @sha256 digest to guarantee the correct prebuilt image.
+# Upgrade kind:
+#   curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.33.0/kind-linux-amd64
+#   chmod +x ./kind && sudo mv ./kind /usr/local/bin/kind
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: cka-lab
 nodes:
   - role: control-plane
-    image: kindest/node:v1.31.0
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
     # Expose ports for Ingress/Gateway experiments later (optional).
     extraPortMappings:
       - containerPort: 80
@@ -21,6 +28,6 @@ nodes:
         hostPort: 8443
         protocol: TCP
   - role: worker
-    image: kindest/node:v1.31.0
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
   - role: worker
-    image: kindest/node:v1.31.0
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5

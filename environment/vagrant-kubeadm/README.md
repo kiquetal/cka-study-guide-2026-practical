@@ -17,7 +17,7 @@ on the exam.
 
 - **Container runtime:** containerd (systemd cgroup driver)
 - **CNI:** Calico (`v3.28.0`), pod CIDR `10.244.0.0/16`
-- **Kubernetes:** pinned to `v1.31` (see "Changing the version" below)
+- **Kubernetes:** pinned to `v1.37` (matches current CKA curriculum; see "Changing the version" below)
 - **Isolation:** nodes sit on a private network `192.168.56.0/24`; nothing is published
   to your host. `vagrant destroy` removes everything.
 

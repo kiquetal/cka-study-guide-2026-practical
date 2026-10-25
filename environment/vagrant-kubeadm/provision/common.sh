@@ -7,7 +7,7 @@
 # the minor version. Then `vagrant destroy -f && vagrant up` to rebuild.
 set -euxo pipefail
 
-K8S_MINOR="v1.31"   # <-- pinned Kubernetes minor version
+K8S_MINOR="v1.37"   # <-- pinned Kubernetes minor version (matches current CKA curriculum)
 
 # The generic/ubuntu2204 box ships systemd-resolved pointed at flaky hardcoded
 # public DNS servers (4.2.2.x). They intermittently fail to resolve, so apt-get

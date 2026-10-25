@@ -21,11 +21,11 @@ engineering depth.
 | Curriculum | CNCF 2025 overhaul (adds Gateway API, CRDs/Operators emphasis) |
 | Kubernetes version | **v1.37** — current curriculum is `CKA_Curriculum_v1.37.pdf` ([CNCF repo](https://github.com/cncf/curriculum)). Tracks ~latest stable; **re-verify before booking** (new minor ~every 4 months). |
 
-> ⚠️ **Lab vs exam version gap:** the lab environments currently pin **v1.31**
-> (`environment/vagrant-kubeadm/provision/common.sh` and
-> `environment/kind/kind-cluster.yaml`). Fine for learning — concepts/commands are
-> stable — but bump both to the then-current curriculum version as your 2027 exam
-> date approaches.
+> ✅ **Lab matches exam version:** both lab environments are pinned to **v1.37**
+> (`environment/vagrant-kubeadm/provision/common.sh` → `K8S_MINOR`, and
+> `environment/kind/kind-cluster.yaml` → `kindest/node:v1.37.0`). This matches the
+> current CKA curriculum. Re-verify and bump again before booking in 2027.
+> **Note:** the v1.37 kind image needs **kind ≥ v0.33.0** (older kind can't run it).
 
 > 🎯 **Exam target: first months of 2027 — top priority.** Study order follows exam
 > weight (Troubleshooting 30% first). Known recent change to study: **HPA
@@ -47,15 +47,16 @@ Running tracker of recent-version changes worth studying:
 
 ### When to use a more modern k8s version in the lab
 
-The lab pins **v1.31**; the exam is on **v1.37**. Guidance:
+The lab now pins **v1.37** — the same version as the current exam. Guidance:
 
-- **Learning fundamentals now (this is 90% of study):** stay on **v1.31**. Pods,
-  Deployments, Services, RBAC, etcd, scheduling, storage — identical commands and
-  behavior across these versions. No reason to rebuild.
-- **Studying a version-specific feature** (e.g. HPA scale-to-zero, a new API that
-  only exists in ≥ v1.36): bump the lab to that version first, or the feature won't
-  be there. These are the exception, not the rule.
-- **~4–6 weeks before booking (early 2027):** bump both environments to the
+- **Fundamentals (90% of study):** v1.37 matches the exam, so you're set. The core
+  commands/behavior (Pods, Deployments, Services, RBAC, etcd, scheduling, storage)
+  are stable across recent versions anyway.
+- **Version-specific features** (e.g. HPA scale-to-zero, Beta in v1.37): now
+  available in the lab since you're on v1.37 — practice them directly.
+- **~4–6 weeks before booking (early 2027):** re-check the
+  [CNCF repo](https://github.com/cncf/curriculum) — if the curriculum has moved past
+  v1.37, bump both environments again and do final mock runs on that version.
   **then-current curriculum version** (re-check the [CNCF repo](https://github.com/cncf/curriculum))
   and do your final mock runs there, so flags/output/deprecations match the real exam.
 
