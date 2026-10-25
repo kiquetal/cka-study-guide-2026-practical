@@ -79,6 +79,11 @@ vagrant destroy -f && vagrant up --provider=libvirt
 
 ## Troubleshooting the setup
 
+> 📄 **Host-OS / toolchain problems** (e.g. after a Pop!_OS 24.04 upgrade: broken
+> `vagrant`, RubyGems version conflict, HashiCorp apt key rotation, in-VM DNS blips)
+> are written up in detail in
+> [`TROUBLESHOOTING-SETUP.md`](TROUBLESHOOTING-SETUP.md).
+
 - **`vagrant up` can't find libvirt provider** → `vagrant plugin install vagrant-libvirt`
   (see [preflight](../preflight-check.md)).
 - **`Error while connecting to Libvirt ... /var/run/libvirt/libvirt-sock: Permission denied`**
