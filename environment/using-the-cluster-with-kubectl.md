@@ -120,11 +120,70 @@ If anything looks wrong: `cp ~/.kube/config.backup.YYYYMMDD ~/.kube/config`.
 
 ---
 
+## Where do the context / cluster / user names come from?
+
+You never typed these names and neither did I — **`kubeadm init` generated them**
+when the control plane was created. The admin kubeconfig it writes to
+`/etc/kubernetes/admin.conf` (copied to `~/.kube/config` on `cp`) always uses the
+same defaults:
+
+| Thing | Name in this lab | Who set it |
+|-------|------------------|------------|
+| **cluster** | `kubernetes` | kubeadm default |
+| **user** (AuthInfo) | `kubernetes-admin` | kubeadm default |
+| **context** | `kubernetes-admin@kubernetes` | kubeadm default |
+
+A **context** is just a named pairing of *(cluster + user [+ optional namespace])*.
+The naming convention is `<user>@<cluster>`, which is why kubeadm's admin context
+reads `kubernetes-admin@kubernetes` — the `kubernetes-admin` user talking to the
+`kubernetes` cluster.
+
+See it yourself (names come straight from the kubeconfig YAML):
+
+```bash
+kcka config get-contexts        # table: CURRENT / NAME / CLUSTER / AUTHINFO / NAMESPACE
+kcka config current-context     # -> kubernetes-admin@kubernetes
+kcka config view --minify       # the full cluster+user+context for the active one
+```
+
+In the YAML this is three top-level lists that reference each other by name:
+
+```yaml
+clusters:
+- name: kubernetes                 # <- the cluster
+  cluster: { server: https://192.168.56.10:6443, certificate-authority-data: ... }
+users:
+- name: kubernetes-admin           # <- the user/credentials
+  user: { client-certificate-data: ..., client-key-data: ... }
+contexts:
+- name: kubernetes-admin@kubernetes  # <- the context: binds the two above
+  context: { cluster: kubernetes, user: kubernetes-admin }
+current-context: kubernetes-admin@kubernetes   # <- which context kubectl uses now
+```
+
+> **Why your EKS contexts look different:** AWS names its contexts after the
+> cluster ARN (`arn:aws:eks:us-east-1:...:cluster/...`). Tools pick their own
+> naming — that's why the lab's short `kubernetes-admin@kubernetes` stands out
+> clearly from your real clusters. That contrast is a feature: it makes
+> `current-context` an instant "am I about to hit the lab or prod?" check.
+
+**Renaming (optional):** if `kubernetes-admin@kubernetes` is too generic, rename
+the context in *your* file (doesn't touch the cluster):
+
+```bash
+kubectl --kubeconfig ~/.kube/cka-lab.config config rename-context \
+  kubernetes-admin@kubernetes cka-lab
+# now: kcka config current-context  ->  cka-lab
+```
+
+---
+
 ## Safety checklist before running any command
 
 1. **Know your context:** `kubectl config current-context`
-   - Lab = `kubernetes-admin@kubernetes`. Anything with `arn:aws:eks:...` is a
-     **real** cluster — stop and switch before running test/destructive commands.
+   - Lab = `kubernetes-admin@kubernetes` (or `cka-lab` if you renamed it).
+     Anything with `arn:aws:eks:...` is a **real** cluster — stop and switch
+     before running test/destructive commands.
 2. **Scope with `-n` / `--namespace`** so you don't touch `kube-system` by accident.
 3. **Treat `cka-lab.config` as a secret** (`chmod 600`); don't commit it (the
    repo `.gitignore` should ignore kubeconfigs — verify).
