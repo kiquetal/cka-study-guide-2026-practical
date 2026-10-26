@@ -24,6 +24,9 @@
   kubeconfig/contexts.
 - 🧪 [`labs/00-first-cluster-bringup.md`](labs/00-first-cluster-bringup.md) — stand up
   the control plane by hand (kubeadm init → kubeconfig → CNI → Ready).
+- 🧪 [`labs/configuring-worker2.md`](labs/configuring-worker2.md) — configure a bare
+  Ubuntu worker node by hand (swap, kernel modules, sysctls, containerd, kube
+  packages) and join it with `kubeadm join`. The exam/real-world node-prep skill.
 - 🧪 Planned labs: RBAC, etcd backup & restore, `kubeadm upgrade`, Helm/Kustomize,
   a CRD + operator install.
 

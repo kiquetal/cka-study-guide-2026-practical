@@ -34,4 +34,19 @@ node/control-plane troubleshooting realism differs.
    - [`vagrant-kubeadm/`](vagrant-kubeadm/) — exam-realistic 3-node cluster.
    - [`kind/`](kind/) — fast disposable cluster.
 
+---
+
+## Operating & understanding the lab
+
+How to actually use and reason about the lab once it's up:
+
+- 🔌 [`using-the-cluster-with-kubectl.md`](using-the-cluster-with-kubectl.md) —
+  point `kubectl` at the lab cluster **without clobbering** your real
+  `~/.kube/config` (e.g. existing EKS contexts). Dedicated kubeconfig, `kcka`
+  alias, safety checklist.
+- 🌐 [`notes-libvirt-nat-and-node-ips.md`](notes-libvirt-nat-and-node-ips.md) —
+  libvirt NAT model and the multi-NIC **two-IP nuance** (API advertise IP vs
+  kubelet InternalIP vs pod/service CIDRs); when the distinction matters and when
+  it doesn't.
+
 Back to [repo index](../README.md).

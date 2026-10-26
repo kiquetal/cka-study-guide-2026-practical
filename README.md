@@ -7,6 +7,9 @@ engineering depth.
 
 > **Legend:** 🎯 = exam scope &nbsp;|&nbsp; 🚀 = beyond exam / real-world
 
+> 🔎 **Looking for a specific doc?** See [`INDEX.md`](INDEX.md) — a flat, fast-lookup
+> list of everything in the repo, plus a "topic → doc" map.
+
 ---
 
 ## Exam overview
