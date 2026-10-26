@@ -71,6 +71,7 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | | Doc | Path |
 |---|-----|------|
 | | Exam prep overview (logistics, cheatsheet, mocks) | [`exam-prep/README.md`](exam-prep/README.md) |
+| 🧠 | **Muscle-memory cheatsheet** (compact one-liners for d-day) | [`exam-prep/memory-muscle.md`](exam-prep/memory-muscle.md) |
 
 ## Course notes & queue
 
@@ -101,3 +102,4 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | PV/PVC/StorageClass | `domains/04-storage/notes-storage.md` |
 | broke the cluster, debugging | `domains/05-troubleshooting/notes-troubleshooting.md` |
 | set up / choose a lab environment | `environment/README.md` |
+| fast kubectl one-liners for exam day | `exam-prep/memory-muscle.md` |
