@@ -49,6 +49,35 @@ eth0  192.168.121.163/24   <- vagrant-libvirt  (SSH + kubelet InternalIP)
 eth1  192.168.56.12/24     <- vagrant-kubeadm0 (API server advertise net)
 ```
 
+ASCII map of the whole topology (host + two NAT nets + each node's two NICs):
+
+```
+                         Pop!_OS HOST (libvirt gateway on both nets)
+                          │                               │
+      vagrant-libvirt ────┤                               ├──── vagrant-kubeadm0
+      192.168.121.0/24    │                               │     192.168.56.0/24
+      (SSH + InternalIP)  │                               │     (API advertise)
+                          │                               │
+        ┌─────────────────┼───────────────┐   ┌───────────┼─────────────────┐
+        ▼                 ▼               ▼   ▼            ▼                 ▼
+   ┌─────────┐       ┌─────────┐      ┌─────────┐
+   │   cp    │       │ worker1 │      │ worker2 │      each node = 2 NICs:
+   │ eth0 .121.61    │ eth0 .121.46   │ eth0 .121.163   eth0 = InternalIP (.121.x)
+   │ eth1 .56.10     │ eth1 .56.11    │ eth1 .56.12     eth1 = advertise   (.56.x)
+   └────┬────┘       └─────────┘      └─────────┘
+        │  API server listens/advertises on eth1
+        ▼
+   JOIN URL  ───────────────────────────────▶  192.168.56.10:6443   (eth1, .56.x)
+   kubectl get nodes INTERNAL-IP ────────────▶  192.168.121.x        (eth0, .121.x)
+
+   pods  ─▶ 10.244.0.0/16   (virtual, Calico; "room" for pods, inside cluster)
+   svcs  ─▶ 10.96.0.0/12    (virtual, ClusterIPs, inside cluster)
+```
+
+> Read the diagram as: **join = follow eth1 (`.56`) to the API server**;
+> **debug/identity = eth0 (`.121`) InternalIP**; **pods/services = virtual CIDRs,
+> never a NIC.** 3 nodes × 2 NICs = ~6 node IPs — the "two" is per node, not per cluster.
+
 ---
 
 ## The nuance that bites you: which IP do I use?
