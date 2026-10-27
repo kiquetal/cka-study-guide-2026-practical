@@ -83,29 +83,35 @@ Mental model — **four IP families, don't mix them up:**
 
 ---
 
-## Why this matters (CKA exam + real world)
+## Why is this relevant?
 
-- **"Node won't join" is almost always an endpoint/firewall problem.** If you hand
-  `kubeadm join` the wrong IP (one the worker can't route to, or a NIC the API
-  server isn't listening on), the TLS bootstrap just times out. Knowing *which*
-  IP is the API endpoint turns a 20-minute head-scratch into a 10-second fix.
-- **Multi-NIC hosts are the norm in production** (management net + data net +
-  storage net). The kubelet picks *one* InternalIP, and it may not be the one you
-  expect. If it picks the wrong NIC, inter-node traffic or `kubectl logs`/`exec`
-  (which the API server proxies to the kubelet's InternalIP) can break. Fix:
-  pin it explicitly with `--node-ip` in the kubelet config/extra-args.
-- **The API server advertise-address is a deliberate choice**, set at
-  `kubeadm init --apiserver-advertise-address=...`. On a multi-NIC control plane
-  you must choose the interface every node can reach. Getting this wrong is a
-  classic "I rebuilt the control plane and now nothing can join" incident.
-- **NAT = isolation**, which is exactly what you want for a throwaway lab, but it
-  also means you cannot `kubectl` the cluster from another machine without extra
-  routing/port-forwarding. Understanding NAT explains *why* the lab is only usable
-  from the host.
-- **Pod/Service CIDRs must not overlap** with your node/host networks. The lab's
-  `10.244.0.0/16` pod CIDR and `10.96.0.0/12` service CIDR are deliberately far
-  from `192.168.x.x`. Overlap → bizarre, hard-to-debug routing failures. This is a
-  real design decision every cluster operator makes.
+- 🎯 **For the exam:**
+  - **"Node won't join" is almost always an endpoint/firewall problem.** If you hand
+    `kubeadm join` the wrong IP (one the worker can't route to, or a NIC the API
+    server isn't listening on), the TLS bootstrap just times out. Knowing *which*
+    IP is the API endpoint turns a 20-minute head-scratch into a 10-second fix.
+  - **`-o wide` reveals the InternalIP each node picked** — first stop when
+    `kubectl logs`/`exec` hangs (the API server proxies those to the InternalIP).
+  - **Don't confuse the IP families.** Two quick corrections people trip on:
+    - *"Two IPs" is per **node**, not per cluster* — each node has 2 NICs
+      (eth0 `.121.x` InternalIP, eth1 `.56.x` advertise net). 3 nodes ⇒ ~6 node IPs.
+    - *InternalIP is identity/reachability, NOT capacity.* "Enough room" for
+      workloads is the **pod CIDR** (`10.244.0.0/16`, huge on purpose) and
+      **service CIDR** (`10.96.0.0/12`) — a different pair of ranges entirely.
+
+- 🌍 **Real-world / edge cases — strange behaviour this explains:**
+  - **Multi-NIC hosts are the norm in production** (management + data + storage
+    nets). The kubelet picks *one* InternalIP and it may be the wrong NIC →
+    inter-node traffic or `kubectl logs`/`exec` break. Fix: pin it with `--node-ip`.
+  - **Rebuilt the control plane and now nothing can join** → the
+    `--apiserver-advertise-address` (`kubeadm init`) points at a NIC the other nodes
+    can't reach. A deliberate choice you must get right on multi-NIC hosts.
+  - **"Weird routing failures" after install** → **pod/service CIDRs overlap** the
+    node/host network. The lab keeps `10.244.0.0/16` + `10.96.0.0/12` far from
+    `192.168.x.x` on purpose; overlap is a real, hard-to-debug outage.
+  - **Can't reach the cluster from another machine** → **NAT = isolation**. Outbound
+    works, inbound is blocked; the lab is only usable from the host without extra
+    port-forwarding.
 
 ---
 
