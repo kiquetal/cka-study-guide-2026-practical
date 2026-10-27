@@ -41,6 +41,7 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 |---|-----|------|
 | | Domain overview + objectives | [`domains/01-cluster-architecture/README.md`](domains/01-cluster-architecture/README.md) |
 | 📖 | Notes (components, kubeadm, RBAC, etcd, upgrades) | [`domains/01-cluster-architecture/notes-cluster-architecture.md`](domains/01-cluster-architecture/notes-cluster-architecture.md) |
+| 📖 | Architecture **diagram** + annotations | [`domains/01-cluster-architecture/notes-cluster-architecture-diagram.md`](domains/01-cluster-architecture/notes-cluster-architecture-diagram.md) |
 | 🧪 | Lab: first cluster bring-up by hand | [`domains/01-cluster-architecture/labs/00-first-cluster-bringup.md`](domains/01-cluster-architecture/labs/00-first-cluster-bringup.md) |
 | 🧪 | Lab: configure a bare worker node + join | [`domains/01-cluster-architecture/labs/configuring-worker2.md`](domains/01-cluster-architecture/labs/configuring-worker2.md) |
 

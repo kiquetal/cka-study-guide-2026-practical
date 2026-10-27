@@ -22,6 +22,9 @@
 - 📖 [`notes-cluster-architecture.md`](notes-cluster-architecture.md) — control-plane
   components, kubeadm lifecycle, RBAC, etcd backup/restore, upgrade workflow,
   kubeconfig/contexts.
+- 📖 [`notes-cluster-architecture-diagram.md`](notes-cluster-architecture-diagram.md) —
+  annotated cluster architecture **diagram** (control plane vs workers, request
+  flow), mapped to the lab's cp/worker1/worker2.
 - 🧪 [`labs/00-first-cluster-bringup.md`](labs/00-first-cluster-bringup.md) — stand up
   the control plane by hand (kubeadm init → kubeconfig → CNI → Ready).
 - 🧪 [`labs/configuring-worker2.md`](labs/configuring-worker2.md) — configure a bare
