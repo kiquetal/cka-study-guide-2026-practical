@@ -1,6 +1,6 @@
 # Domain 05 — Troubleshooting (30%)
 
-🎯 Highest-weight domain. Source: [CNCF CKA Curriculum](https://github.com/cncf/curriculum).
+🎯 Highest-weight domain. Source: [CNCF CKA Curriculum](https://github.com/cncf/curriculum). Objectives verified verbatim against the official **CKA Curriculum v1.37** (2026-10-27).
 
 ## Exam objectives (official competencies)
 

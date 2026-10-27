@@ -1,6 +1,6 @@
 # Domain 02 — Workloads & Scheduling (15%)
 
-🎯 Source: [CNCF CKA Curriculum](https://github.com/cncf/curriculum).
+🎯 Source: [CNCF CKA Curriculum](https://github.com/cncf/curriculum). Objectives verified verbatim against the official **CKA Curriculum v1.37** (2026-10-27).
 
 ## Exam objectives (official competencies)
 
