@@ -15,6 +15,8 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | Repo overview, exam info, how-to-use | [`README.md`](README.md) |
 | Full multi-increment plan | [`PLAN.md`](PLAN.md) |
 | 2027 study timeline | [`roadmap/2027-study-plan.md`](roadmap/2027-study-plan.md) |
+| **Notes workflow** (capture → formalize) | [`course-notes/README.md`](course-notes/README.md) |
+| Note template (consistent shape) | [`domains/NOTE-TEMPLATE.md`](domains/NOTE-TEMPLATE.md) |
 
 ## Lab environment (set up & operate the cluster)
 
