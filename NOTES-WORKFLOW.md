@@ -105,7 +105,46 @@ Unsure? Ask "where does this go?" and it gets placed per this table.
 
 ---
 
-## 5. Naming & linking rules (so it stays findable)
+## 5. Screenshots & visuals (your keys: visual + real presentation)
+
+Visuals and real/verified output are the priority — they are what make the notes
+stick. When you drop a screenshot and say *"here's the screenshot talking about
+X"*, the exact routine is:
+
+```
+  screenshot dropped ("here's the screenshot about X")
+        │
+        ▼
+  1. VIEW it         — actually open the image, read what it shows (never guess)
+  2. EXPAND it       — theory -> mechanism -> real world (the §3 ordering)
+        │               start from the idea the image shows, end at lab proof
+        ▼
+  3. DECIDE placement — apply the rule below
+```
+
+**Decision rule — inbox vs. domain:**
+
+| Situation | Where it goes |
+|-----------|---------------|
+| Image maps to an exam concept (architecture, a resource, a flow) | **Promote now** to `domains/NN-*/` — embed under `images/`, write the note with the template, link from README + INDEX |
+| Still fuzzy / you're mid-reading / not sure of the topic yet | **Keep in the inbox** — reference it from `course-notes/notes.md`, formalize later |
+| Throwaway (a terminal error we're fixing, a one-off) | **Neither** — handle inline, don't archive |
+
+> Default bias: **if it clearly belongs to one exam domain, promote it immediately**
+> (a good diagram is too valuable to leave in the fuzzy bag). Only keep it in the
+> inbox when the topic is still unclear.
+
+**How images are stored & shown:**
+- Copy the image into `domains/NN-*/images/<descriptive-name>.png` (not left in
+  `~/Pictures`), so the repo is self-contained and the picture renders in the note.
+- Embed it near the top: `![alt](images/<file>.png)` + a caption saying what it is
+  and **how it maps to the lab** (e.g. "control plane = `cp`").
+- Pair every diagram with **real verified lab output** lower in the note, so the
+  picture (concept) and the proof (reality) sit together.
+
+---
+
+## 6. Naming & linking rules (so it stays findable)
 
 - **File name:** `notes-<topic>.md` (kebab-case), inside the domain folder.
 - **Labs:** `domains/NN-*/labs/<name>.md`. **Images:** `domains/NN-*/images/<file>.png`.
@@ -116,19 +155,22 @@ Unsure? Ask "where does this go?" and it gets placed per this table.
 
 ---
 
-## 6. Rules Kiro follows (the contract)
+## 7. Rules Kiro follows (the contract)
 
 When you ask to formalize/capture a note, Kiro will:
 
 1. Put raw/fuzzy captures in `course-notes/`; put formalized notes in the matching
    `domains/NN-*/` (per the routing table).
 2. Use the **template section order** (§3) — theory first, lab-verified output last.
-3. Prefer **real, verified** lab output in "Verified on the lab" — run the command,
+3. For **screenshots**: view the image first, expand it theory→real, then decide
+   inbox vs. domain per §5 (default: promote if it maps to a domain). Copy the
+   image into the domain's `images/` and pair it with real lab output.
+4. Prefer **real, verified** lab output in "Verified on the lab" — run the command,
    don't invent output. If it can't be verified, say so.
-4. Embed diagrams under the domain's `images/` and reference them relatively.
-5. Link every new note from the domain README **and** `INDEX.md`.
-6. Keep `course-notes/` lean — prune raw notes after promoting.
-7. Keep one consistent voice/shape across all notes; never reorder template sections.
+5. Embed diagrams under the domain's `images/` and reference them relatively.
+6. Link every new note from the domain README **and** `INDEX.md`.
+7. Keep `course-notes/` lean — prune raw notes after promoting.
+8. Keep one consistent voice/shape across all notes; never reorder template sections.
 
 ---
 
