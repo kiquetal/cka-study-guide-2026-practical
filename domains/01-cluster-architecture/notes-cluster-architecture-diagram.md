@@ -15,6 +15,30 @@ control plane = `cp`, workers = `worker1` + `worker2`.*
 A cluster splits into **control plane** (the brain — decides *what should happen*)
 and **worker nodes** (the muscle — actually *run the containers*).
 
+Which components live where (ASCII):
+
+```
+  CONTROL-PLANE NODE (cp)                     WORKER NODE (worker1 / worker2)
+  ┌───────────────────────────────┐          ┌───────────────────────────────┐
+  │  CONTROL-PLANE (static pods):  │          │                               │
+  │    • kube-apiserver            │          │        (no control plane)     │
+  │    • etcd                      │          │                               │
+  │    • kube-scheduler            │          │                               │
+  │    • kube-controller-manager   │          │                               │
+  │  ─────────────────────────────│          │ ──────────────────────────────│
+  │  NODE agents (every node):     │          │  NODE agents (every node):    │
+  │    • kubelet                   │          │    • kubelet                  │
+  │    • kube-proxy                │          │    • kube-proxy               │
+  │    • container runtime         │          │    • container runtime        │
+  │      (containerd)              │          │      (containerd)             │
+  │    • CNI agent (calico-node)   │          │    • CNI agent (calico-node)  │
+  └───────────────────────────────┘          └───────────────────────────────┘
+
+  KEY: the control-plane 4 (apiserver/etcd/scheduler/controller-mgr) run ONLY on cp.
+       the node agents (kubelet/kube-proxy/runtime/CNI) run on EVERY node, cp included.
+       → cp = "a worker node that ALSO runs the 4 control-plane static pods".
+```
+
 ### Clients (left of the diagram)
 
 - **`kubectl` (CLI)** and the **Dashboard (UI)** are *clients*. They don't live in
