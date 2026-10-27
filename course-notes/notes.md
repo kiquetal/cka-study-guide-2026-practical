@@ -4,16 +4,13 @@
 
 ---
 
-## 2026-10-24 — Example entry (delete me)
+## 2026-10-27 — Rumble notes
 
-- Watched: intro / exam overview.
-- Key takeaway: CKA is 100% hands-on, 2 hours, 66% to pass.
-- Command I want to remember:
-  ```bash
-  kubectl run nginx --image=nginx --dry-run=client -o yaml
-  ```
-- Something I didn't fully get → added it to `questions-for-kiro.md`.
+- kubelet =  per-node agent that takes pod specs from the API server and makes the container runtime actually run them, and reports node/pod health back
 
----
+- scheduler = watches for Pods with no node assigned and decides WHICH node each runs on (resources, taints/tolerations, affinity). It only assigns — the kubelet actually runs it.
 
-<!-- Add your entries below -->
+- controller-manager = runs control loops that watch desired vs actual state and reconcile them. e.g. Deployment wants 3 pods, only 2 exist -> it creates the 3rd; a node dies -> it replaces its pods. (reconciliation loop = core k8s idea). If it's down, dead pods don't get recreated.
+
+> handoff for `kubectl apply` (3 replicas):
+> controller-manager (create 3 Pod objects) -> scheduler (assign each to a node) -> kubelet (tell containerd to run them)
