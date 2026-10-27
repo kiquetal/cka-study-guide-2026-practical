@@ -36,6 +36,16 @@ We'll use #1 and #2 to keep the lab separate.
 
 Keep the lab config in its own file and point at it only when you want the lab.
 
+### Which file do I copy, and from where?
+
+- **The file lives on the control-plane (`cp`), at `/home/vagrant/.kube/config`.**
+  It is a copy of `/etc/kubernetes/admin.conf`, which `kubeadm init` generated —
+  the cluster's **admin** kubeconfig (full god-mode credentials).
+- You copy **that one file** to your Pop!_OS host, into a **separate** path
+  (`~/.kube/cka-lab.config`) so it never overwrites your real `~/.kube/config`.
+- Workers (`worker1`/`worker2`) do **not** have this file — that's why `kubectl`
+  only works from `cp` or your host, never from a worker.
+
 ```bash
 # One-time: pull the admin kubeconfig off the control-plane into a SEPARATE file
 cd /mydata/codes/2026/cka-study-guide-2026-practical/environment/vagrant-kubeadm
@@ -43,6 +53,10 @@ sg libvirt -c "vagrant ssh cp -c 'cat /home/vagrant/.kube/config'" \
   | grep -v -E 'Unrecognized|^\[fog\]' > ~/.kube/cka-lab.config
 chmod 600 ~/.kube/cka-lab.config      # it holds admin creds — treat as a secret
 ```
+
+> **Re-copy after a rebuild:** if you `vagrant destroy` + `vagrant up` the lab,
+> the cluster CA is regenerated, so the old `cka-lab.config` stops working. Just
+> run the copy command above again to refresh it.
 
 Use it per-command (nothing persists, zero risk to your default config):
 
