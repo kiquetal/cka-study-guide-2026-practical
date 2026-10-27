@@ -86,6 +86,65 @@ worker2   Ready    <none>          v1.37.1   <- (you configured this one by hand
 
 ---
 
+## 💡 Discovery: the control plane runs a kubelet too (static pods)
+
+**The diagram simplifies.** It shows kubelet/kube-proxy only on workers — but in a
+real kubeadm cluster **the control-plane node (`cp`) also runs a kubelet,
+kube-proxy, and a container runtime.** Here's the key realization:
+
+**The control-plane components (API server, scheduler, controller-manager, etcd)
+are themselves pods — run by the kubelet on `cp`.** They are **static pods**: the
+kubelet watches the directory `/etc/kubernetes/manifests/` and runs any pod
+manifest it finds there **directly**, without going through the API server or the
+scheduler.
+
+Why static pods? **Bootstrap chicken-and-egg.** You can't ask the API server to
+schedule the API server — it doesn't exist yet. So the kubelet starts it from a
+file on disk. That's the trick that brings the whole control plane to life.
+
+### Verified on this lab (`cp`):
+
+```text
+# kubelet IS running on the control-plane:
+systemctl is-active kubelet   ->  active
+
+# the control-plane components are static-pod manifests on disk:
+/etc/kubernetes/manifests/
+  etcd.yaml
+  kube-apiserver.yaml
+  kube-controller-manager.yaml
+  kube-scheduler.yaml
+
+# and they appear in the cluster with the node name appended (-cp):
+etcd-cp                      1/1  Running
+kube-apiserver-cp            1/1  Running
+kube-controller-manager-cp   1/1  Running
+kube-scheduler-cp            1/1  Running
+kube-proxy-nz7zv             1/1  Running   # yes, kube-proxy on cp too
+```
+
+That **`-<nodename>` suffix** (`-cp`) is the tell-tale sign of a static pod (the
+kubelet publishes a read-only "mirror pod" into the API so you can *see* it).
+
+### Why this matters (exam + real world)
+
+- **To restart/retune a control-plane component, you edit the manifest file, not
+  `kubectl`.** e.g. move `kube-apiserver.yaml` out of the folder and back in — the
+  kubelet notices and restarts the pod. You cannot `kubectl delete` a static pod
+  away; it's owned by the file.
+- **API server down? `kubectl` can't help you** (it needs the API server). Debug
+  from the kubelet layer instead: `crictl ps`, `journalctl -u kubelet`, and the
+  static manifests under `/etc/kubernetes/manifests/`.
+- **Flags, certs, etcd tuning** for control-plane components live in those YAML
+  manifests — edit there.
+
+**Updated mental model:** *every* kubeadm node runs the worker trio (kubelet +
+kube-proxy + runtime). A control-plane node is "a node that *also* runs the four
+control-plane static pods on top." The planes are a **role**, not a different kind
+of machine.
+
+---
+
 ## 30-second self-test
 
 1. Which component does `kubectl` talk to? → **API server** (over HTTPS).
@@ -95,3 +154,5 @@ worker2   Ready    <none>          v1.37.1   <- (you configured this one by hand
 5. What makes Service IPs route to pods? → **kube-proxy**.
 6. Why can't you run `kubectl` on a worker? → workers have no admin kubeconfig;
    `kubectl` is a client of the API server, which lives on the control plane.
+7. Does the control-plane node run a kubelet? → **Yes** — it runs the control-plane
+   components as **static pods** from `/etc/kubernetes/manifests/`.
