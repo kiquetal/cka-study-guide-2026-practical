@@ -252,3 +252,64 @@ kubectl get node worker2 -o wide
 > **kubernetes.io → "Installing kubeadm"** and the "Creating a cluster with
 > kubeadm" / "join" pages. Knowing *where* the join and reset commands live is
 > half the battle under time pressure.
+
+---
+
+## Wait — did I need to configure the CNI (Calico) on the worker? **No.**
+
+A common point of confusion: you prep the node and join it, but you **never touch
+CNI config on a worker** — yet the node still gets networking. Here's why:
+
+- The CNI (Calico) was installed **once, cluster-wide, from the control-plane**
+  during `kubeadm init` setup (`kubectl apply -f calico.yaml`). That created a
+  Calico **DaemonSet**.
+- A **DaemonSet runs one pod on *every* node automatically — including nodes that
+  join later.** The instant `worker2` joined, the scheduler placed a
+  `calico-node-*` pod on it with no action from you.
+- That Calico pod sets up the node's pod networking, which is what flips the node
+  from `NotReady` → `Ready`. The brief `NotReady` window right after join is
+  simply "waiting for the CNI pod to land."
+
+Verify the CNI landed on the new node (run on cp):
+
+```bash
+kubectl -n kube-system get pods -o wide --field-selector spec.nodeName=worker2
+# expect: calico-node-xxxxx Running   +   kube-proxy-xxxxx Running
+```
+
+**Mental model:** node-prep (swap/modules/sysctls/containerd/kube tools) + `join`
+is *your* job per node. The CNI is a cluster-level add-on installed once — it
+self-propagates to new nodes via its DaemonSet. You only reinstall/reconfigure a
+CNI at the **cluster** level, never per worker.
+
+---
+
+## Real-run lessons (from doing this by hand on Pop!_OS/libvirt)
+
+Issues that actually came up — expect these and you'll move faster:
+
+1. **DNS was broken on the bare node.** Because we used `vagrant up --no-provision`,
+   `common.sh`'s DNS fix never ran, so `apt-get` failed with "Temporary failure
+   resolving". Fix: point `/etc/resolv.conf` at working nameservers before any
+   apt/curl:
+   ```bash
+   echo "nameserver 1.1.1.1"  > /etc/resolv.conf
+   echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+   ```
+2. **"Permission denied" writing `/etc/...` = you're not root.** Run `sudo -i`
+   first; confirm with `whoami` → `root`. (Reason: `cmd > /etc/file` opens the
+   file as *your* user before `sudo` applies — use `sudo tee` if not root.)
+3. **Long commands break when pasted** (terminal wraps them, splitting a flag
+   from its value → "flag needs an argument" / "command not found"). For the long
+   `kubeadm join` line and the apt repo line, **put them in a file and run that**,
+   or edit with `nano`, instead of pasting into the prompt:
+   ```bash
+   nano /root/join.sh      # paste the full 'kubeadm join ...' as ONE line, save
+   bash /root/join.sh
+   ```
+4. **A `deb` source entry must be ONE line.** A wrapped paste produced a
+   "Malformed entry ... (URI)" error in `kubernetes.list`. Fix by rewriting it as
+   a single line (via `nano` or `printf`) and `cat` it to confirm no wrap.
+5. **`kubectl` "fails" on the worker — that's correct.** Workers have no admin
+   kubeconfig. Run `kubectl` on the control-plane (or your host). See
+   [`../../../environment/using-the-cluster-with-kubectl.md`](../../../environment/using-the-cluster-with-kubectl.md).
