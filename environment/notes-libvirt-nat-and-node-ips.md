@@ -99,6 +99,24 @@ So "the address to **talk to the API / join**" is deliberately **not** "the addr
 to **SSH to the physical node**." Two NICs, two jobs, one machine. (On a single-NIC
 host they'd be the same IP — that's why the split only shows up here.)
 
+**Both IPs matter to Kubernetes — it's two-way traffic, not "one is only for SSH":**
+
+```
+   node (kubelet) ──(.56.x: "I'm calling the API server")──▶  API server   (OUTBOUND)
+   node           ◀──(.121.x: "API server reaches me back")──  API server   (INBOUND)
+```
+
+- **`.56.x` (advertise) = how nodes reach the API server** — every kubelet dials
+  `192.168.56.10:6443` to join *and stay connected forever*. Direction: node → API.
+- **`.121.x` (InternalIP) = how the API server reaches the node back** — it's the
+  address the API server proxies to for `kubectl logs` / `exec` / `port-forward`.
+  Direction: API → node. It *doubles* as the SSH IP here by coincidence (kubelet
+  grabbed the SSH NIC), but it is a genuine Kubernetes address, not "just SSH".
+
+> Quick test: `kubectl logs <pod-on-worker2>` travels to worker2's **`.121.x`
+> InternalIP** (the API server proxies there). That proves `.121.x` is actively
+> used by Kubernetes, not merely an SSH address.
+
 ---
 
 ## The nuance that bites you: which IP do I use?
