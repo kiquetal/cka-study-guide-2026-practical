@@ -62,6 +62,14 @@ You will see **two different IPs for the same cluster**, and it's not a bug:
   (the API server's `--advertise-address`, which was set from the Vagrantfile's
   `private_network` = `eth1`).
 
+> ⚠️ **This is the point of divergence — memorize it:** the **join URL is the API
+> server endpoint (`192.168.56.10:6443`), NEVER the node InternalIP
+> (`192.168.121.x`).** They're different NICs doing different jobs. Every worker's
+> kubelet keeps talking to that API endpoint forever (not just at join). The
+> serving cert only covers the advertise IP, so substituting the InternalIP →
+> TLS fails / "node won't join". On a single-NIC host the two collapse into one
+> address, which is why people assume they're the same — they are **not** here.
+
 **Rule of thumb for this lab:**
 
 - **To join a worker** → use the **API server endpoint**, i.e. `192.168.56.10:6443`
