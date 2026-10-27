@@ -53,6 +53,24 @@ node box in the diagram):
 
 ---
 
+## Why is this relevant?
+
+- 🎯 **For the exam:** this diagram *is* the mental model the whole exam leans on —
+  nearly every task is "make component X do its job." Knowing the request flow tells
+  you where to look: pod won't schedule → scheduler; pod not recreated → controller
+  manager; `kubectl` dead → API server/etcd.
+- 🌍 **Real-world / edge cases — strange behaviour this explains:**
+  - Whole cluster unreachable (`kubectl` connection refused) → the **API server**
+    (or etcd behind it) is down, not "the network."
+  - A Deployment stays at 0 pods with no events → **controller-manager** stopped
+    reconciling.
+  - Pods stuck `Pending` → **scheduler** down or no node fits (FILTER failed).
+  - Service IP reachable but traffic doesn't land → **kube-proxy** on a node didn't
+    program its rules.
+  - Node `Ready` but pods never start on it → that node's **kubelet**/runtime issue.
+
+---
+
 ## How a request flows (memorize this)
 
 `kubectl apply -f deploy.yaml` →

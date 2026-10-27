@@ -21,6 +21,13 @@ Then link it from that domain's README and from the top-level INDEX.md.
 
 <The core concept in plain language. What problem it solves. The mental model.>
 
+## Why is this relevant?
+
+<!-- Two angles. Keep it tight — a few bullets each. This is what justifies the note. -->
+- 🎯 **For the exam:** <what task/competency this maps to; why it earns points.>
+- 🌍 **Real-world / edge cases:** <the strange behaviour or outage this explains —
+  "if you ever see X, it's probably this." The non-obvious failure it unlocks.>
+
 ## Key parts
 
 | Thing | Job | Exam-relevant note |

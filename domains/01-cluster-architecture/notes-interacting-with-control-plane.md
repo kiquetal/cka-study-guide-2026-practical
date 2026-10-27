@@ -32,6 +32,26 @@ and knowing *which layer* is the whole skill:
 
 ---
 
+## Why is this relevant?
+
+- 🎯 **For the exam:** this is the muscle behind several high-frequency tasks —
+  "back up/restore etcd", "the API server won't start, fix it", "check control-plane
+  health". Knowing *which layer* (kubectl vs etcdctl vs node/manifests) to drop to
+  is the difference between solving it in 2 minutes and burning 15.
+- 🌍 **Real-world / edge cases — strange behaviour this explains:**
+  - `kubectl` hangs or returns `connection refused` cluster-wide → the **API server
+    pod** is down; nothing works until you fix its static manifest (not a "network"
+    issue as it first looks).
+  - You `kubectl apply` something and it silently doesn't take effect → could be the
+    **controller-manager** crash-looping (reconciliation stopped) — check its logs.
+  - Pods stay `Pending` forever with no events → the **scheduler** may be down.
+  - Cluster is slow / write errors under load → check **etcd** `endpoint status`
+    (DB size near the 2 GB quota, or a lost leader) — a classic non-obvious outage.
+  - etcd disk fills or the data dir corrupts → the *entire* cluster state is at
+    risk; this is why `snapshot save` on a schedule is a real production habit.
+
+---
+
 ## Key parts — how you interact with each
 
 | Component | Normal interaction | Direct/low-level interaction |

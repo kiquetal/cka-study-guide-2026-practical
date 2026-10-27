@@ -75,14 +75,17 @@ Concretely, each `domains/NN/notes-<topic>.md` has these sections **in this orde
 1. **Title + 🎯 domain/weight + one-line why it matters**
 2. **Diagram** (optional) — image embedded from `images/`
 3. **The idea (theory)** — plain-language concept + mental model
-4. **Key parts** — table (thing / job / exam-relevant note)
-5. **How it works / flow** — numbered mechanism or request lifecycle
-6. **Verified on the lab** — REAL output from `vagrant-kubeadm` or `kind`
+4. **Why is this relevant?** — two angles: 🎯 **for the exam** (task/competency it
+   maps to) and 🌍 **real-world / edge cases** (the strange behaviour or outage it
+   explains — "if you ever see X, it's probably this")
+5. **Key parts** — table (thing / job / exam-relevant note)
+6. **How it works / flow** — numbered mechanism or request lifecycle
+7. **Verified on the lab** — REAL output from `vagrant-kubeadm` or `kind`
    (this is the theory→real-world payoff: proof, not claims)
-7. **Commands to remember** — the few imperative one-liners
-8. **Gotchas / failure modes** — mistake → symptom → fix
-9. **30-second self-test** — Q→A pairs to drill recall
-10. **See also** — cross-links to related notes/labs
+8. **Commands to remember** — the few imperative one-liners
+9. **Gotchas / failure modes** — mistake → symptom → fix
+10. **30-second self-test** — Q→A pairs to drill recall
+11. **See also** — cross-links to related notes/labs
 
 Delete sections that don't apply, but **never reorder** them.
 
