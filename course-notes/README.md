@@ -1,5 +1,9 @@
 # Course Notes — the "capture → formalize" workflow
 
+> **Full rules & spec:** [`../NOTES-WORKFLOW.md`](../NOTES-WORKFLOW.md) is the
+> single source of truth (structure, ASCII flow, theory→real-world ordering, and
+> the rules Kiro follows). This file is the short version.
+
 This folder is the **inbox**: a free-form place to dump fuzzy, half-formed notes
 *fast* while reading/watching, without breaking flow. Nothing here is final.
 

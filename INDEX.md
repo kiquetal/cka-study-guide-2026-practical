@@ -16,6 +16,7 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | Full multi-increment plan | [`PLAN.md`](PLAN.md) |
 | 2027 study timeline | [`roadmap/2027-study-plan.md`](roadmap/2027-study-plan.md) |
 | **Notes workflow** (capture → formalize) | [`course-notes/README.md`](course-notes/README.md) |
+| **★ Notes process spec** (rules + ASCII + theory→real) | [`NOTES-WORKFLOW.md`](NOTES-WORKFLOW.md) |
 | Note template (consistent shape) | [`domains/NOTE-TEMPLATE.md`](domains/NOTE-TEMPLATE.md) |
 
 ## Lab environment (set up & operate the cluster)
