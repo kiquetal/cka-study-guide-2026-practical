@@ -78,6 +78,27 @@ ASCII map of the whole topology (host + two NAT nets + each node's two NICs):
 > **debug/identity = eth0 (`.121`) InternalIP**; **pods/services = virtual CIDRs,
 > never a NIC.** 3 nodes × 2 NICs = ~6 node IPs — the "two" is per node, not per cluster.
 
+### The crux: "reach the API" ≠ "reach the physical node"
+
+The in-cluster virtual IPs (pods `10.244.x`, services `10.96.x`) are the easy part —
+clearly separate, overlay-managed. The part that actually trips people is on the
+**node's real NICs**:
+
+```
+  SSH / reach the physical node   →  eth0  192.168.121.x   (vagrant-libvirt mgmt net)
+  API advertise / join the cluster →  eth1  192.168.56.x    (vagrant-kubeadm0 net)
+                                        └── SAME machine, DIFFERENT NIC & IP ──┘
+```
+
+- **SSH** rides the **management** network (`vagrant-libvirt`, `.121`) — it's how you
+  (and Vagrant) *log into the box*. kubelet reused this NIC as the node InternalIP.
+- The **API server advertises** on a **separate** network (`vagrant-kubeadm0`, `.56`)
+  because the Vagrantfile's `private_network` put the cluster traffic there.
+
+So "the address to **talk to the API / join**" is deliberately **not** "the address
+to **SSH to the physical node**." Two NICs, two jobs, one machine. (On a single-NIC
+host they'd be the same IP — that's why the split only shows up here.)
+
 ---
 
 ## The nuance that bites you: which IP do I use?
