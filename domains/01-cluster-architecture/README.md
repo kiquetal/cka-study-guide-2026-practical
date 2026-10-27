@@ -25,6 +25,9 @@
 - 📖 [`notes-cluster-architecture-diagram.md`](notes-cluster-architecture-diagram.md) —
   annotated cluster architecture **diagram** (control plane vs workers, request
   flow), mapped to the lab's cp/worker1/worker2.
+- 📖 [`notes-interacting-with-control-plane.md`](notes-interacting-with-control-plane.md) —
+  **real use case:** how to interact with each component (etcd via `etcdctl`,
+  API-server health, scheduler/CM logs) with verified lab output.
 - 🧪 [`labs/00-first-cluster-bringup.md`](labs/00-first-cluster-bringup.md) — stand up
   the control plane by hand (kubeadm init → kubeconfig → CNI → Ready).
 - 🧪 [`labs/configuring-worker2.md`](labs/configuring-worker2.md) — configure a bare
