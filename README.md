@@ -84,6 +84,9 @@ these sections get built out.
 
 - **PRIMARY — _CKA Study Guide, 2nd Edition_ (Benjamin Muschko)** — rebuilt for the
   2025 curriculum overhaul (CRDs/Operators, Gateway API). Main reference for this repo.
+- **PRIMARY — _Acing the Certified Kubernetes Administrator Exam, 2nd Edition_
+  (Chad Crowell, Manning, Oct 2025)** — revised for the post-2025 CKA; strong
+  second author's framing on the same curriculum. Pairs well with Muschko.
 - **SECONDARY — _Certified Kubernetes Administrator (CKA), 4th Edition_ [Video]** —
   newest video edition; watch for hands-on demonstrations.
 

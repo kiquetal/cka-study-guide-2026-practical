@@ -57,6 +57,7 @@ Not sure? Ask me ("where does this go?") and I'll place it consistently.
 ## Primary resources
 
 - **PRIMARY:** _CKA Study Guide, 2nd Edition_ (Benjamin Muschko) — 2025 overhaul edition.
+- **PRIMARY:** _Acing the CKA Exam, 2nd Edition_ (Chad Crowell, Manning, Oct 2025).
 - **SECONDARY:** _CKA, 4th Edition_ [Video].
 
 > Everything formalized is findable from the top-level [`INDEX.md`](../INDEX.md).
