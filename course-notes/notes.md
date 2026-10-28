@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-10-27 — RBAC verify: `kubectl auth can-i`
+
+- `kubectl auth can-i <verb> <resource>` → yes/no for ME (current kubeconfig user). no action taken, just a permission check.
+- `--list` = dump ALL my perms. cluster-admin shows the row `*.*  →  [*]`.
+- impersonate to check SOMEONE ELSE: `--as=jane`, `--as-group=devs`, or a SA: `--as=system:serviceaccount:<ns>:<sa>`.
+- the exam loop: create Role + RoleBinding → verify with `can-i <v> <r> --as=jane -n dev` (expect yes) and a denied verb (expect no → proves it's scoped).
+- gotcha: a fresh ServiceAccount with no binding can do NOTHING (verified: default SA → `can-i list secrets --as=system:serviceaccount:default:default` → no). deny by default.
+- `--quiet` → no output, exit 0=yes/1=no (scripts). namespaced check needs `-n`.
+
+📎 **formalized in:**
+[`domains/01-cluster-architecture/notes-rbac-auth-can-i.md`](../domains/01-cluster-architecture/notes-rbac-auth-can-i.md) (verified lab output + create→verify loop)
+
+---
+
 ## 2026-10-27 — Crowell ch.2 (certs + what's a daemon vs a pod)
 
 - what runs as a real DAEMON (systemd service, NOT a pod): **kubelet** AND **containerd** (the runtime). I first thought only kubelet — but containerd is also a systemd daemon. Check: `systemctl is-active containerd` -> active.
