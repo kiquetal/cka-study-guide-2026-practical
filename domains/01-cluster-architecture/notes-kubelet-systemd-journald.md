@@ -46,6 +46,9 @@ them at boot, and *they* bring up everything else. That's why you manage them wi
 
 | Command | What it tells you |
 |---------|-------------------|
+| `systemctl list-units --type=service` | **discover** loaded+running services (find kubelet/containerd) |
+| `systemctl list-unit-files` | which units exist on disk and if they're `enabled` at boot |
+| `systemctl list-units --state=failed` | one-glance "what's broken on this node?" |
 | `systemctl is-active kubelet` | up (`active`) or down |
 | `systemctl status kubelet` | state, PID, uptime, the exact `ExecStart` line, cgroup |
 | `systemctl cat kubelet` | the unit **+ the kubeadm drop-in** (`10-kubeadm.conf`) |
@@ -74,6 +77,20 @@ and `systemctl restart kubelet` — there is no `kubectl` for this.
 ## Verified on the lab
 
 ```text
+$ systemctl list-units --type=service --state=running | grep -E 'kubelet|containerd'
+  containerd.service   loaded active running containerd container runtime
+  kubelet.service      loaded active running kubelet: The Kubernetes Node Agent
+
+$ systemctl list-unit-files | grep -E 'kubelet|containerd'
+containerd.service   enabled   enabled
+kubelet.service      enabled   enabled
+# (also note dozens of cri-containerd-<id>.scope transient units — each is ONE
+#  running container; that's how containerd wires containers into systemd)
+
+$ systemctl list-units --state=failed
+● systemd-networkd-wait-online.service  loaded failed failed  Wait for Network...
+# ^ harmless on this box, but this is the "what's broken on the node?" one-glance
+
 $ systemctl is-active kubelet ; systemctl is-enabled kubelet
 active
 enabled
@@ -103,6 +120,11 @@ via a systemd drop-in, not by editing the base unit.
 ## Commands to remember
 
 ```bash
+# discover services on the node (find kubelet/containerd, spot failures)
+systemctl list-units --type=service --state=running   # what's running now
+systemctl list-unit-files | grep -E 'kubelet|containerd'  # enabled at boot?
+systemctl list-units --state=failed                   # what's broken?
+
 # is the node agent up? why not?
 systemctl status kubelet
 sudo journalctl -u kubelet -n 50 --no-pager   # recent logs
