@@ -91,6 +91,16 @@ $ systemctl list-units --state=failed
 ● systemd-networkd-wait-online.service  loaded failed failed  Wait for Network...
 # ^ harmless on this box, but this is the "what's broken on the node?" one-glance
 
+$ systemctl list-units 'kube*' 'containerd*' --type=service    # SCOPED to k8s
+  containerd.service   loaded active running   containerd container runtime
+  kubelet.service      loaded active running   kubelet: The Kubernetes Node Agent
+2 loaded units listed.
+
+$ systemctl list-units 'kubepods-*.slice'      # cgroup slices: pods grouped by QoS
+  kubepods-besteffort.slice            loaded active active  ...
+  kubepods-burstable-pod<id>.slice     loaded active active  ...
+# ^ the kubelet maps pod QoS (guaranteed/burstable/besteffort) onto cgroup slices
+
 $ systemctl is-active kubelet ; systemctl is-enabled kubelet
 active
 enabled
@@ -124,6 +134,12 @@ via a systemd drop-in, not by editing the base unit.
 systemctl list-units --type=service --state=running   # what's running now
 systemctl list-unit-files | grep -E 'kubelet|containerd'  # enabled at boot?
 systemctl list-units --state=failed                   # what's broken?
+
+# SCOPED to kubernetes — systemctl takes a glob PATTERN argument (cleaner than grep):
+systemctl list-units 'kube*' 'containerd*' --type=service   # just kubelet + containerd
+systemctl list-units 'kube*' 'containerd*' --all            # include inactive too
+systemctl list-units 'cri-containerd-*'                     # the per-container scopes
+systemctl list-units 'kubepods-*.slice'                     # the pod cgroup slices (QoS)
 
 # is the node agent up? why not?
 systemctl status kubelet
