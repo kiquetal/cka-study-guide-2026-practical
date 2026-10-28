@@ -4,6 +4,20 @@
 
 ---
 
+## 2026-10-27 — Crowell ch.2 (certs + what's a daemon vs a pod)
+
+- what runs as a real DAEMON (systemd service, NOT a pod): **kubelet** AND **containerd** (the runtime). I first thought only kubelet — but containerd is also a systemd daemon. Check: `systemctl is-active containerd` -> active.
+- everything else (apiserver, etcd, scheduler, controller-manager) runs as **static pods** that the kubelet launches from `/etc/kubernetes/manifests/`. So: daemons start the floor, pods are the rest.
+- certs: every control-plane component talks over **mutual TLS**; kubeadm generates all of it under `/etc/kubernetes/pki/`.
+  - **etcd has its OWN CA + certs** in `/etc/kubernetes/pki/etcd/` (separate from the main cluster CA). That's why `etcdctl` uses etcd's certs, not the main ones.
+  - the apiserver is the ONLY thing that talks to etcd, using a special `apiserver-etcd-client` cert as its "badge".
+- mental model:
+  - systemd daemons (processes): kubelet, containerd
+  - static pods (run by kubelet): apiserver, etcd, scheduler, controller-manager
+  - all secured by kubeadm mTLS certs in pki/ ; etcd has its own CA in pki/etcd/
+
+---
+
 ## 2026-10-27 — Rumble notes
 
 - kubelet =  per-node agent that takes pod specs from the API server and makes the container runtime actually run them, and reports node/pod health back
