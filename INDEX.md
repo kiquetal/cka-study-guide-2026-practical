@@ -107,6 +107,7 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | Services, Ingress, Gateway API, NetworkPolicy, CoreDNS | `domains/03-services-networking/notes-services-networking.md` |
 | scheduling, taints/tolerations, HPA | `domains/02-workloads-scheduling/` |
 | PV/PVC/StorageClass | `domains/04-storage/notes-storage.md` |
+| kubelet systemd / journalctl / node NotReady | `domains/01-cluster-architecture/notes-kubelet-systemd-journald.md` |
 | broke the cluster, debugging | `domains/05-troubleshooting/notes-troubleshooting.md` |
 | set up / choose a lab environment | `environment/README.md` |
 | fast kubectl one-liners for exam day | `exam-prep/memory-muscle.md` |

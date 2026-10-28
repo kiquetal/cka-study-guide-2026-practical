@@ -28,6 +28,9 @@
 - 📖 [`notes-interacting-with-control-plane.md`](notes-interacting-with-control-plane.md) —
   **real use case:** how to interact with each component (etcd via `etcdctl`,
   API-server health, scheduler/CM logs) with verified lab output.
+- 📖 [`notes-kubelet-systemd-journald.md`](notes-kubelet-systemd-journald.md) — the
+  **Linux layer:** kubelet/containerd as systemd services, `journalctl` for insight,
+  the kubeadm drop-in; how to debug a `NotReady` node when `kubectl` cannot help.
 - 📖 [`notes-kubeadm-certificates.md`](notes-kubeadm-certificates.md) — **kubeadm
   PKI:** the certs/CAs kubeadm generates under `/etc/kubernetes/pki/`, the
   ~1y-leaf vs ~10y-CA expiry trap, `certs check-expiration` / `certs renew`.
