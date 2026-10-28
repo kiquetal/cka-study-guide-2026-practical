@@ -79,6 +79,34 @@ three cert flags + the endpoint. The manifest tells you exactly what to use:
 So: endpoint `https://127.0.0.1:2379`, and certs under `/etc/kubernetes/pki/etcd/`.
 Memorize that path — the exam gives you a broken cluster and expects you to know it.
 
+### How the API server talks to etcd (mutual TLS)
+
+The API server is the **only** component that talks to etcd. It's **mTLS** — *both*
+sides present a certificate and verify the other against a shared CA:
+
+```
+   KUBE-APISERVER                         ETCD  (listens on :2379)
+   ┌──────────────────────┐              ┌──────────────────────────┐
+   │ presents CLIENT cert: │   mTLS       │ presents SERVER cert:     │
+   │  apiserver-etcd-client│◀───────────▶│  etcd/server.crt          │
+   │  .crt / .key          │  both verify │  etcd/server.key          │
+   └──────────┬───────────┘  vs etcd CA  └───────────┬──────────────┘
+              │                                       │
+              └──────── both trust ───────────────────┘
+                   /etc/kubernetes/pki/etcd/ca.crt   (the etcd CA)
+
+   apiserver flags (in kube-apiserver.yaml):        etcd flags (in etcd.yaml):
+     --etcd-cafile   = pki/etcd/ca.crt                --trusted-ca-file = pki/etcd/ca.crt
+     --etcd-certfile = pki/apiserver-etcd-client.crt  --cert-file       = pki/etcd/server.crt
+     --etcd-keyfile  = pki/apiserver-etcd-client.key  --key-file        = pki/etcd/server.key
+```
+
+- The API server's "badge" to etcd = **`apiserver-etcd-client.crt`** (in `pki/`, NOT
+  `pki/etcd/`) — it's a *client* cert signed by the **etcd CA**.
+- etcd presents **`server.crt`** (in `pki/etcd/`), also signed by the etcd CA.
+- Both check each other against **`pki/etcd/ca.crt`**. Mismatch/expiry here →
+  apiserver can't reach etcd → whole cluster is dead.
+
 ---
 
 ## Verified on the lab
