@@ -16,6 +16,11 @@
   - static pods (run by kubelet): apiserver, etcd, scheduler, controller-manager
   - all secured by kubeadm mTLS certs in pki/ ; etcd has its own CA in pki/etcd/
 
+📎 **formalized in:**
+[`domains/01-cluster-architecture/notes-kubelet-systemd-journald.md`](../domains/01-cluster-architecture/notes-kubelet-systemd-journald.md) (daemons) ·
+[`notes-kubeadm-certificates.md`](../domains/01-cluster-architecture/notes-kubeadm-certificates.md) (PKI) ·
+[`notes-interacting-with-control-plane.md`](../domains/01-cluster-architecture/notes-interacting-with-control-plane.md) (apiserver↔etcd mTLS ASCII)
+
 ---
 
 ## 2026-10-27 — Rumble notes
@@ -36,3 +41,7 @@
 > 3. scheduler sees 3 Pods with no node -> assigns each to a node (writes nodeName back via API server)
 > 4. each target node's kubelet sees "a Pod is assigned to me" -> tells containerd to pull image + run it
 > (everything flows THROUGH the API server; etcd is the source of truth)
+
+📎 **formalized in:**
+[`domains/01-cluster-architecture/notes-cluster-architecture-diagram.md`](../domains/01-cluster-architecture/notes-cluster-architecture-diagram.md) (components + request flow) ·
+[`notes-interacting-with-control-plane.md`](../domains/01-cluster-architecture/notes-interacting-with-control-plane.md) (talking to each component)

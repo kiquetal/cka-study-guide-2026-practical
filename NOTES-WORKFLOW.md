@@ -164,16 +164,23 @@ When you ask to formalize/capture a note, Kiro will:
 
 1. Put raw/fuzzy captures in `course-notes/`; put formalized notes in the matching
    `domains/NN-*/` (per the routing table).
-2. Use the **template section order** (§3) — theory first, lab-verified output last.
-3. For **screenshots**: view the image first, expand it theory→real, then decide
+2. **`course-notes/notes.md` is the home base / index.** A capture always STAYS
+   there, and when its content is formalized into a domain note, the inbox entry
+   gets a `📎 formalized in: [link]` pointer to that domain note. Never silently
+   move content into a domain without leaving a link back from the inbox — that's
+   how you avoid "getting lost". (Overrides the old "prune the inbox" step: keep
+   the entry + link, don't delete it.)
+3. Use the **template section order** (§3) — theory first, lab-verified output last.
+4. For **screenshots**: view the image first, expand it theory→real, then decide
    inbox vs. domain per §5 (default: promote if it maps to a domain). Copy the
    image into the domain's `images/` and pair it with real lab output.
-4. Prefer **real, verified** lab output in "Verified on the lab" — run the command,
+5. Prefer **real, verified** lab output in "Verified on the lab" — run the command,
    don't invent output. If it can't be verified, say so.
-5. Embed diagrams under the domain's `images/` and reference them relatively.
-6. Link every new note from the domain README **and** `INDEX.md`.
-7. Keep `course-notes/` lean — prune raw notes after promoting.
-8. Keep one consistent voice/shape across all notes; never reorder template sections.
+6. Embed diagrams under the domain's `images/` and reference them relatively.
+7. Link every new note from the domain README **and** `INDEX.md`.
+8. Keep `course-notes/` as the home-base index: entries stay, each with a
+   `📎 formalized in:` link to its domain note (per rule 2) — do not delete them.
+9. Keep one consistent voice/shape across all notes; never reorder template sections.
 
 ---
 
