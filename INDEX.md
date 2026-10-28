@@ -102,6 +102,7 @@ navigation and fast inference. Legend: 🎯 exam scope · 🧪 hands-on lab ·
 | add/prep a worker node (swap, containerd, join) | `domains/01-cluster-architecture/labs/configuring-worker2.md` |
 | bring up the control plane by hand | `domains/01-cluster-architecture/labs/00-first-cluster-bringup.md` |
 | etcd backup/restore, RBAC, upgrades | `domains/01-cluster-architecture/notes-cluster-architecture.md` |
+| cert expired / kubeadm PKI / renew certs | `domains/01-cluster-architecture/notes-kubeadm-certificates.md` |
 | talk to etcd / component health / logs | `domains/01-cluster-architecture/notes-interacting-with-control-plane.md` |
 | Services, Ingress, Gateway API, NetworkPolicy, CoreDNS | `domains/03-services-networking/notes-services-networking.md` |
 | scheduling, taints/tolerations, HPA | `domains/02-workloads-scheduling/` |

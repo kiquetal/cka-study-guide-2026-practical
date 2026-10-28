@@ -28,6 +28,9 @@
 - 📖 [`notes-interacting-with-control-plane.md`](notes-interacting-with-control-plane.md) —
   **real use case:** how to interact with each component (etcd via `etcdctl`,
   API-server health, scheduler/CM logs) with verified lab output.
+- 📖 [`notes-kubeadm-certificates.md`](notes-kubeadm-certificates.md) — **kubeadm
+  PKI:** the certs/CAs kubeadm generates under `/etc/kubernetes/pki/`, the
+  ~1y-leaf vs ~10y-CA expiry trap, `certs check-expiration` / `certs renew`.
 - 🧪 [`labs/00-first-cluster-bringup.md`](labs/00-first-cluster-bringup.md) — stand up
   the control plane by hand (kubeadm init → kubeconfig → CNI → Ready).
 - 🧪 [`labs/configuring-worker2.md`](labs/configuring-worker2.md) — configure a bare
